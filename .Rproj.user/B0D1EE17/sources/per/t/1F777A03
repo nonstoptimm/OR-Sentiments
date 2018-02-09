@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1518185682916.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1273027839",
+    "id" : "1F777A03",
+    "lastKnownWriteTime" : 1518185767,
+    "last_content_update" : 1518185767293,
+    "path" : "~/Documents/Humboldt/Masterarbeit/Sentiment-Repository/import-data.R",
+    "project_path" : "import-data.R",
+    "properties" : {
+        "cursorPosition" : "7,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

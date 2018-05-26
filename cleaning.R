@@ -1,46 +1,102 @@
+library(tidyverse)
+library(textstem)
 
-# Subset the entire dataset to create an easier-to-handle data chunk
-# rawdata_subset <- rawdata[1:1000, ]
+# SAPPLY TOLOWER
+makeLow <- function(input) {
+  input$review <- sapply(input$review, tolower)
+  input$brand <- sapply(input$brand, tolower)
+  return(input)
+}
+# Apply makeLow Function
+merged_cellphone_brand <- makeLow(merged_cellphone_brand)
+merged_coffee_brand <- makeLow(merged_coffee_brand)
+merged_headphone_brand <- makeLow(merged_headphone_brand)
+merged_toaster_brand <- makeLow(merged_toaster_brand)
 
+# DETECT REVIEW LANGUAGE
+detectLanguage <- function(input) {
+  langProfile <- TC_byte_profiles[names(TC_byte_profiles) %in% c("english", "french", "spanish", "german", "italian", "portuguese")]
+  reviewLanguage <- textcat(input, p = langProfile)
+  return(reviewLanguage)
+}
+# Apply detectLanguage Function
+merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
+merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
+merged_coffee$reviewLanguage <- detectLanguage(merged_coffee$review)
+merged_toaster$reviewLanguage <- detectLanguage(merged_toaster$review)
+  
+# DELETE ALL NON-ENGLISH REVIEWS
+deleteNotEnglish <- function(input) {
+  input %>%
+    filter(reviewLanguage == "english") %>%
+    select(-reviewLanguage)
+}
+# Apply deleteNotEnglish Function
+merged_cellphone <- deleteNotEnglish(merged_cellphone)
+merged_headphone <- deleteNotEnglish(merged_headphone)
+merged_coffee <- deleteNotEnglish(merged_coffee)
+merged_toaster <- deleteNotEnglish(merged_toaster)
 
-# Create Corpus from Vector Source
-review_corpus <- VCorpus(VectorSource(rawdata_subset$reviewText))
+# CORRECT CONTRACTIONS
+correctContraction <- function(reviews, contraction_list) {
+  for(pattern in 1:nrow(contraction_list)) {
+    reviews <- gsub(contraction_list$contraction[pattern], contraction_list$full[pattern], reviews, ignore.case =TRUE)
+  }
+  return(reviews)
+}
+# Apply correctContraction Function
+merged_cellphone_brand$review <- correctContraction(merged_cellphone_brand$review, contraction_list)
+merged_coffee_brand$review <- correctContraction(merged_coffee_brand$review, contraction_list)
+merged_headphone_brand$review <- correctContraction(merged_headphone_brand$review, contraction_list)
+merged_toaster_brand$review <- correctContraction(merged_toaster_brand$review, contraction_list)
 
-# Function for Corpus Cleaning
-clean_corpus <- function(corpus){
-  corpus <- tm_map(corpus, stripWhitespace)
-  corpus <- tm_map(corpus, removePunctuation)
-  corpus <- tm_map(corpus, content_transformer(tolower))
-  corpus <- tm_map(corpus, removeWords, c(stopwords("en")))
-  return(corpus)
+# CORRECT INDIVIDUAL WORDS
+correctWord <- function(input, before, after) {
+  reviews <- gsub(before, after, input, ignore.case =TRUE)
+  return(reviews)
+}
+# Apply correctWord Function
+prep_toaster_brand$review <- correctWord(prep_toaster_brand$review, "toaster", "toast")
+
+# REMOVE PUNCTUATION AND STUFF
+removePunctuation <- function(reviews) {
+  reviews <- gsub("&#8217;", "'", reviews)
+  reviews <- gsub("\\$", " dollar ", reviews)
+  reviews <- gsub("\\%", " percent ", reviews)
+  reviews <- gsub("\\W", " ", reviews)
+  return(reviews)
+}
+# Apply removePunctuation Function
+merged_cellphone_brand$review <- removePunctuation(merged_cellphone_brand$review)
+merged_coffee_brand$review <- removePunctuation(merged_coffee_brand$review)
+merged_headphone_brand$review <- removePunctuation(merged_headphone_brand$review)
+merged_toaster_brand$review <- removePunctuation(merged_toaster_brand$review)
+
+# Detect Incorrect Words
+detectIncorrect <- function(input) {
+  incorrectWords <- lapply(input, hunspell_check)
+  return(incorrectWords)
+} 
+
+# Word Stemming/Lemmatize
+lemmatizeText <- function(input) {
+  input %>% lemmatize_strings()
 }
 
-# Clean Corpus with "clean_corpus"-Function 
-clean_corp <- clean_corpus(review_corpus)
+# Create a copy of the dataset
+prep_cellphone_brand <- merged_cellphone_brand
+prep_coffee_brand <- merged_coffee_brand
+prep_toaster_brand  <- merged_toaster_brand
+prep_headphone_brand  <- merged_headphone_brand
 
-# Store as Document Term Matrix
-review_dtm <- DocumentTermMatrix(clean_corp)
-# Store as Term Document Matrix (for the word cloud)
-review_tdm <- TermDocumentMatrix(clean_corp)
+# Create a copy for dtm
+dtm_cellphone_brand <- prep_cellphone_brand
+dtm_coffee_brand <- prep_coffee_brand
+dtm_toaster_brand  <- prep_toaster_brand
+dtm_headphone_brand  <- prep_headphone_brand
 
-# Store as Matrix
-review_dtm_m <- as.matrix(review_dtm)
-review_tdm_m <- as.matrix(review_tdm)
-
-# RowSums für the Word Cloud
-review_words <- rowSums(review_tdm_m)
-review_words <- sort(review_words, decreasing = TRUE)
-# Dataframe for the Word Cloud
-review_freqs <- data.frame(term = names(review_words), num = review_words)
-# Create the Wordcloud
-wordcloud(review_freqs$term, review_freqs$num, max.words = 70, color = "blue")
-
-# Definition of Tokenizer-Function
-tokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
-
-# Store as TOKENIZED Document Term Matrix
-bigram_dtm <- DocumentTermMatrix(clean_corp, control = list(tokenize = tokenizer))
-bigram_dtm_m <- as.matrix(bigram_dtm)
-freq <- colSums(bigram_dtm_m)
-bi_words <- names(freq)
-wordcloud(bi_words, freq, max.words=15)
+# Apply to dataset
+prep_cellphone_brand$review <- lemmatizeText(prep_cellphone_brand$review)
+prep_coffee_brand$review <- lemmatizeText(prep_coffee_brand$review)
+prep_toaster_brand$review <- lemmatizeText(prep_toaster_brand$review)
+prep_headphone_brand$review <- lemmatizeText(prep_headphone_brand$review)

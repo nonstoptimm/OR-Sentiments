@@ -17,14 +17,17 @@ calcMeanScore <- function(input) {
 }
 # Calculate Means for Sentiment Scores
 # Cellphone
-mean_cellphone <- calcMeanScore(prep_cellphone_brand)
-fwrite(mean_cellphone, "output/mean_cellphone.csv")
+calcMeanScore(merged_topic_cellphone)
+# fwrite(calcMeanScore(prep_cellphone_brand), "output/mean_cellphone.csv")
 # Toaster
-mean_toaster <- calcMeanScore(merged_topic_toaster)
-fwrite(mean_toaster, "output/mean_toaster.csv")
+calcMeanScore(merged_topic_toaster)
+# fwrite(calcMeanScore(prep_toaster_brand), "output/mean_toaster.csv")
 # Coffee
-mean_coffee <- calcMeanScore(merged_topic_coffee)
-fwrite(mean_coffee, "output/mean_coffee.csv")
+calcMeanScore(merged_topic_coffee)
+# fwrite(calcMeanScore(merged_topic_coffee), "output/mean_coffee.csv")
+# Headphone
+calcMeanScore(prep_headphone_brand)
+# fwrite(calcMeanScore(merged_topic_coffee), "output/mean_headphone.csv")
 
 # VARIANCE
 calcVarScore <- function(input) {
@@ -41,14 +44,18 @@ calcVarScore <- function(input) {
 }
 # Calculate Variance Deviation for Sentiment Scores
 # Cellphones
-var_cellphone <- calcVarScore(merged_topic_cellphone)
-fwrite(var_cellphone, "output/var_cellphone.csv")
+calcVarScore(merged_topic_cellphone)
+#fwrite(calcVarScore(merged_topic_cellphone), "output/var_cellphone.csv")
 # Toaster
-var_toaster <- calcVarScore(prep_toaster_brand)
-fwrite(var_toaster, "output/var_toaster.csv")
+calcVarScore(prep_toaster_brand)
+#fwrite(calcVarScore(prep_toaster_brand), "output/var_toaster.csv")
 # Coffee
-var_coffee <- calcVarScore(prep_coffee_brand)
-fwrite(var_coffee, "output/var_coffee.csv")
+calcVarScore(prep_coffee_brand)
+#fwrite(calcVarScore(prep_coffee_brand), "output/var_coffee.csv")
+# Headphone
+calcVarScore(prep_headphone_brand)
+#fwrite(calcVarScore(prep_headphone_brand), "output/var_headphone.csv")
+
 
 # STANDARD DEVIATION
 calcSdScore <- function(input) {
@@ -66,16 +73,20 @@ calcSdScore <- function(input) {
 
 # Calculate Standard Deviation for Sentiment Scores
 # Cellphone
-sd_cellphone <- calcSdScore(merged_topic_cellphone)
-sd_cellphone_apple <- calcSdScore(merged_topic_apple)
-sd_cellphone_apple <- calcSdScore(merged_topic_samsung)
+calcSdScore(merged_topic_cellphone)
+calcSdScore(merged_topic_apple)
+calcSdScore(merged_topic_samsung)
 fwrite(sd_cellphone, "output/sd_cellphone.csv")
 # Toaster
-sd_toaster <- calcSdScore(prep_toaster_brand)
-fwrite(sd_toaster, "output/sd_toaster.csv")
+calcSdScore(prep_toaster_brand)
+fwrite(calcSdScore(prep_toaster_brand), "output/sd_toaster.csv")
 # Coffee
-sd_coffee <- calcSdScore(prep_coffee_brand)
-fwrite(sd_coffee, "output/sd_coffee.csv")
+calcSdScore(prep_coffee_brand)
+fwrite(calcSdScore(prep_coffee_brand), "output/sd_coffee.csv")
+# Headphone
+calcSdScore(prep_headphone_brand)
+#fwrite(calcSdScore(prep_headphone_brand), "output/sd_headphone.csv")
+
 
 # CORRELATION COEFFICIENT
 corrCoeff <- function(input) {
@@ -84,14 +95,17 @@ corrCoeff <- function(input) {
 }
 # Calculate Correlation Coefficient for Sentiment Scores
 # Cellphone
-cor_cellphone <- corrCoeff(merged_topic_samsung)
-fwrite(cor_cellphone, "output/cor_cellphone.csv")
+corrCoeff(merged_topic_samsung)
+#fwrite(corrCoeff(merged_topic_samsung), "output/cor_cellphone.csv")
 # Toaster
-cor_toaster <- corrCoeff(prep_toaster_brand)
-fwrite(cor_toaster, "output/cor_toaster.csv")
+corrCoeff(prep_toaster_brand)
+#fwrite(corrCoeff(prep_toaster_brand), "output/cor_toaster.csv")
 # Coffee
-cor_coffee <- corrCoeff(prep_coffee_brand)
-fwrite(cor_coffee, "output/cor_coffee.csv")
+corrCoeff(prep_coffee_brand)
+#fwrite(corrCoeff(prep_coffee_brand), "output/cor_coffee.csv")
+# Headphone
+corrCoeff(prep_headphone_brand)
+#fwrite(corrCoeff(prep_coffee_brand), "output/cor_headphone.csv")
 
 ########## STATISTICAL TESTS ON BRANDS ############
 # MEAN
@@ -111,16 +125,18 @@ calcMeanScoreBrand <- function(input, brandSelect) {
 }
 # Calculate Means for Sentiment Scores
 # Cellphone
-mean_cellphone_apple <- calcMeanScoreBrand(prep_cellphone_brand, "apple")
-fwrite(mean_cellphone_apple, "output/mean_cellphone_apple.csv")
-mean_cellphone_oceancross <- calcMeanScoreBrand(prep_cellphone_brand, "ocean cross")
-fwrite(mean_cellphone_oceancross, "output/mean_cellphone_oceancross.csv")
-mean_cellphone_samsung <- calcMeanScoreBrand(prep_cellphone_brand, "samsung")
-fwrite(mean_cellphone_samsung, "output/mean_cellphone_samsung.csv")
+calcMeanScoreBrand(prep_cellphone_brand, "apple")
+#fwrite(calcMeanScoreBrand(prep_cellphone_brand, "apple"), "output/mean_cellphone_apple.csv")
+calcMeanScoreBrand(prep_cellphone_brand, "ocean cross")
+#fwrite(calcMeanScoreBrand(prep_cellphone_brand, "ocean cross"), "output/mean_cellphone_oceancross.csv")
+calcMeanScoreBrand(prep_cellphone_brand, "samsung")
+#fwrite(calcMeanScoreBrand(prep_cellphone_brand, "samsung"), "output/mean_cellphone_samsung.csv")
 # Toaster
 calcMeanScoreBrand(prep_toaster_brand, "")
 # Coffee
 calcMeanScoreBrand(prep_coffee_brand, "")
+# Headphone
+calcMeanScoreBrand(prep_headphone_brand, "sennheiser")
 
 # VARIANCE
 calcVarScoreBrand <- function(input, brandSelect) {
@@ -138,16 +154,20 @@ calcVarScoreBrand <- function(input, brandSelect) {
 }
 # Calculate Variance Deviation for Sentiment Scores
 # Cellphones
-var_cellphone_apple <- calcVarScoreBrand(prep_cellphone_brand, "apple")
-fwrite(var_cellphone_apple, "output/var_cellphone_apple.csv")
-var_cellphone_apple <- calcVarScoreBrand(merged_topic_samsung, "samsung")
-fwrite(var_cellphone_apple, "output/var_cellphone_apple.csv")
+calcVarScoreBrand(prep_cellphone_brand, "apple")
+#fwrite(calcVarScoreBrand(prep_cellphone_brand, "apple"), "output/var_cellphone_apple.csv")
+calcVarScoreBrand(dtm_cellphone_brand, "ocean cross")
+#fwrite(calcVarScoreBrand(merged_topic_samsung, "samsung"), "output/var_cellphone_apple.csv")
 # Toaster
-#var_toaster <- calcVarScoreBrand(prep_toaster_brand, "")
-#fwrite(var_toaster, "output/var_toaster.csv")
+calcVarScoreBrand(prep_toaster_brand, "")
+#fwrite(calcVarScoreBrand(prep_toaster_brand, ""), "output/var_toaster.csv")
 # Coffee
-#var_coffee <- calcVarScoreBrand(prep_coffee_brand, "")
-#fwrite(var_coffee, "output/var_coffee.csv")
+calcVarScoreBrand(prep_coffee_brand, "")
+#fwrite(calcVarScoreBrand(prep_coffee_brand, ""), "output/var_coffee.csv")
+# Headphone
+calcVarScoreBrand(prep_headphone_brand, "beats")
+#fwrite(calcVarScoreBrand(prep_headphone_brand, ""), "output/var_coffee.csv")
+
 
 # STANDARD DEVIATION
 calcSdScoreBrand <- function(input, brandSelect) {
@@ -166,12 +186,15 @@ calcSdScoreBrand <- function(input, brandSelect) {
 
 # Calculate Standard Deviation for Sentiment Scores
 # Cellphone
-sd_cellphone_apple <- calcSdScoreBrand(prep_cellphone_brand, "apple")
+calcSdScoreBrand(dtm_cellphone_brand, "ocean cross")
 fwrite(sd_cellphone_apple, "output/sd_cellphone_apple.csv")
 # Toaster
 # calcSdScoreBrand(prep_toaster_brand, "")
 # Coffee
 # calcSdScoreBrand(prep_coffee_brand, "")
+# Headphone
+calcSdScoreBrand(prep_headphone_brand, "sennheiser")
+
 
 
 ### TOPIC MODEL STATISTICS ####

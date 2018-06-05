@@ -13,7 +13,7 @@ tokenizeReview <- function(input) {
 }
 # Apply it to datasets
 tokenized_cellphone <- tokenizeReview(prep_cellphone_brand)
-#tokenized_headphone <- tokenizeReview(prep_headphone_brand)
+tokenized_headphone <- tokenizeReview(prep_headphone_brand)
 tokenized_coffee <- tokenizeReview(prep_coffee_brand)
 tokenized_toaster <- tokenizeReview(prep_toaster_brand)
 
@@ -24,7 +24,7 @@ removeStopwords <- function(input){
 } 
 # Apply to tokenized dataset
 tokenized_cellphone <- removeStopwords(tokenized_cellphone)
-#tokenized_headphone <- removeStopwords(tokenized_headphone)
+tokenized_headphone <- removeStopwords(tokenized_headphone)
 tokenized_coffee <- removeStopwords(tokenized_coffee)
 tokenized_toaster <- removeStopwords(tokenized_toaster)
 
@@ -42,7 +42,7 @@ countWords <- function(input) {
     count(word, sort = TRUE) 
 }
 # Apply to tokenized dataset
-#countWordsHeadphone <- countWords(tokenized_headphone)
+countWordsHeadphone <- countWords(tokenized_headphone)
 countWordsCellphone <- countWords(tokenized_cellphone)
 countWordsToaster <- countWords(tokenized_toaster)
 countWordsCoffee <- countWords(tokenized_coffee)
@@ -54,7 +54,7 @@ countWordsDocument <- function(input) {
     arrange(asin, reviewerID)
 }
 # Apply Count for DTM
-countWordsDocumentCellphone <- countWordsDocument(tokenized_cellphone)
+#countWordsDocumentCellphone <- countWordsDocument(tokenized_cellphone)
 
 # Count Words without Unwanted Words
 countWordsUnw <- function(input, unwanted) { 
@@ -64,7 +64,7 @@ countWordsUnw <- function(input, unwanted) {
 }
 # Count Top Words excluding unwanted 
 wf_cellphone <- countWordsUnw(tokenized_cellphone, c("phone", "buy", "product", "2"))
-#wf_cellphone <- countWordsUnw(tokenized_headphone, c())
+wf_headphone <- countWordsUnw(tokenized_headphone, c("headphone"))
 wf_toaster <- countWordsUnw(tokenized_toaster, c("toaster", "toast", "buy", "product"))
 wf_coffee <- countWordsUnw(tokenized_coffee, c("coffee", "buy", "machine", "maker"))
 
@@ -77,10 +77,11 @@ countWordsBrand <- function(input, unwanted) {
   ungroup()
 }
 # Apply countWordsBrand
-#countWordsBrand(tokenized_headphone)
 wf_cellphone_brand <- countWordsBrand(tokenized_cellphone, c("phone", "buy", "product", "2"))
 wf_coffee_brand <- countWordsBrand(tokenized_coffee, c("coffee", "buy", "machine", "maker"))
 wf_toaster_brand <- countWordsBrand(tokenized_toaster, c("toaster", "toast", "buy", "product"))
+wf_headphone_brand <- countWordsBrand(tokenized_headphone, c("headphone", "buy"))
+
 
 # Most common words entire category
 countWordsCategory <- function(input, unwanted) {
@@ -91,10 +92,10 @@ countWordsCategory <- function(input, unwanted) {
     ungroup()
 }
 # Apply countWordsCategory
-#countWordsBrand(tokenized_headphone)
 wf_cellphone_category <- countWordsCategory(tokenized_cellphone, c("phone", "buy", "product", "2"))
 wf_coffee_category <- countWordsCategory(tokenized_coffee, c("coffee", "buy", "machine", "maker"))
 wf_toaster_category <- countWordsCategory(tokenized_toaster, c("toaster", "toast", "buy", "product"))
+wf_headphone_category <- countWordsCategory(tokenized_headphone, c("headphone", "buy"))
 
 # TF-IDF for the whole Category
 tf_idf_general <- function(input) {
@@ -102,7 +103,7 @@ tf_idf_general <- function(input) {
   bind_tf_idf(asin, reviewerID, word, n) %>%
   arrange(desc(tf_idf))  
 }
-tf_idf_general(countWordsCellphone)
+tf_idf_general(countWordsHeadphone)
 
 # Function for getting Lexicon-based Sentiment
 getSentiment <- function(input, lexicon) {
@@ -112,12 +113,12 @@ getSentiment <- function(input, lexicon) {
   ungroup()
 }
 # Get Sentiments for Unigrams
-sentiment_coffee_bing <- getSentiment(tokenized_coffee, "bing")
+getSentiment(tokenized_coffee, "bing")
 getSentiment(tokenized_coffee, "nrc")
 getSentiment(tokenized_toaster, "bing")
 getSentiment(tokenized_toaster, "nrc")
-#getSentiment(tokenized_headphone, "bing")
-#getSentiment(tokenized_headphone, "nrc")
+getSentiment(tokenized_headphone, "bing")
+getSentiment(tokenized_headphone, "nrc")
 getSentiment(tokenized_cellphone, "bing")
 getSentiment(tokenized_cellphone, "nrc")
 

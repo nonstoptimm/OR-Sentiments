@@ -82,6 +82,11 @@ detectIncorrect <- function(input) {
 lemmatizeText <- function(input) {
   input %>% lemmatize_strings()
 }
+# Apply to dataset
+prep_cellphone_brand$review <- lemmatizeText(prep_cellphone_brand$review)
+prep_coffee_brand$review <- lemmatizeText(prep_coffee_brand$review)
+prep_toaster_brand$review <- lemmatizeText(prep_toaster_brand$review)
+prep_headphone_brand$review <- lemmatizeText(prep_headphone_brand$review)
 
 # Create a copy of the dataset
 prep_cellphone_brand <- merged_cellphone_brand
@@ -94,9 +99,3 @@ dtm_cellphone_brand <- prep_cellphone_brand
 dtm_coffee_brand <- prep_coffee_brand
 dtm_toaster_brand  <- prep_toaster_brand
 dtm_headphone_brand  <- prep_headphone_brand
-
-# Apply to dataset
-prep_cellphone_brand$review <- lemmatizeText(prep_cellphone_brand$review)
-prep_coffee_brand$review <- lemmatizeText(prep_coffee_brand$review)
-prep_toaster_brand$review <- lemmatizeText(prep_toaster_brand$review)
-prep_headphone_brand$review <- lemmatizeText(prep_headphone_brand$review)

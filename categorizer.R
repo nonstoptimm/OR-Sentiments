@@ -7,15 +7,17 @@ joinData <- function(reviews, metadata) {
   return(merged)
 }
 
-# Add Sentiment Score from Deep Learning Model
+# ROUND AND ADD SENTIMENT SCORE FROM THE DEEP LEARNING MODEL
 addSentiScore <- function(sentiment) {
   scoreRounded <- round(sentiment$Score, 5)
   return(scoreRounded)
 }
+# Apply the function to the dataset
 prep_coffee_brand$scoreNN <- addSentiScore(score_coffee)
 prep_toaster_brand$scoreNN <- addSentiScore(score_toaster)
 prep_cellphone_brand$scoreNN <- addSentiScore(score_cellphone)
 prep_headphone_brand$scoreNN <- addSentiScore(score_headphone)
+
 
 ## PHONES
 # Filter based on sub-categories
@@ -28,7 +30,6 @@ meta_cellphone <- categorizeMetaPhone(meta_cellphone)
 # Apply inner_join
 merged_cellphone <- joinData(raw_cellphone, meta_cellphone)
 merged_cellphone$categories.0.3 <- merged_cellphone$categories.0.4 <- NULL
-
 
 ## HEADPHONES
 categorizeMetaHeadphones <- function(input) {

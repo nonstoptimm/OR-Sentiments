@@ -2,7 +2,8 @@ library(topicmodels)
 library(purrr)
 library(dplyr)
 library(tidyverse)
-# CREATE ID FOR TOPIC MODEL
+library(tidytext)
+# CREATE ID FOR TOPIC MODEL TO MERGE THE TOPIC MODEL IT LATER
 createID <- function(input){
   document <- paste(input$asin, input$reviewerID, sep = "-") 
   return(document)
@@ -11,9 +12,9 @@ createID <- function(input){
 dtm_toaster_brand$document <- createID(dtm_toaster_brand)
 dtm_cellphone_brand$document <- createID(dtm_cellphone_brand)
 dtm_coffee_brand$document <- createID(dtm_coffee_brand)
-# dtm_headphone_brand$document <- createID(dtm_headphone_brand)
+dtm_headphone_brand$document <- createID(dtm_headphone_brand)
 
-# Filter for Special Brand
+# FILTER FOR SPECIAL BRAND
 dtm_filterBrand <- function(input, selectBrand) {
   input %>%
     filter(brand == selectBrand)
@@ -21,6 +22,7 @@ dtm_filterBrand <- function(input, selectBrand) {
 # Apply dtm_filterBrand to dataset
 dtm_cellphone_apple <- dtm_filterBrand(dtm_cellphone_brand, "apple")
 dtm_cellphone_samsung <- dtm_filterBrand(dtm_cellphone_brand, "samsung")
+dtm_headphone_beats <- dtm_filterBrand(dtm_headphone_brand, "beats")
 
 # SPLIT INTO WORDS
 dtm_wordByReview <- function(input) {
@@ -33,8 +35,9 @@ dtm_apple_byReview <- dtm_wordByReview(dtm_cellphone_apple)
 dtm_samsung_byReview <- dtm_wordByReview(dtm_cellphone_samsung)
 dtm_coffee_byReview <- dtm_wordByReview(dtm_coffee_brand)
 dtm_toaster_byReview <- dtm_wordByReview(dtm_toaster_brand)
+dtm_headphone_byReview <- dtm_wordByReview(dtm_headphone_brand)
 
-# COUNT BY REVIEW
+# REMOVE STOPWORDS
 dtm_docDetect <- function(input) {
   input %>%
     anti_join(stop_words) %>%
@@ -44,6 +47,7 @@ dtm_docDetect <- function(input) {
 # Apply dtm_docDetect Function to Dataset
 dtm_detect_apple <- dtm_docDetect(dtm_apple_byReview)
 dtm_detect_cellphone <- dtm_docDetect(dtm_cellphone_byReview)
+dtm_detect_headphone <- dtm_docDetect(dtm_headphone_byReview)
 
 # JOIN FILTERED DATA
 dtm_join <- function(input, filtered) {
@@ -56,6 +60,7 @@ merged_topic_apple <- dtm_join(dtm_cellphone_apple, dtm_docDetect(dtm_apple_byRe
 merged_topic_samsung <- dtm_join(dtm_cellphone_samsung, dtm_docDetect(dtm_samsung_byReview))
 merged_topic_toaster <- dtm_join(dtm_toaster_brand, dtm_docDetect(dtm_toaster_byReview))
 merged_topic_coffee <- dtm_join(dtm_coffee_brand, dtm_docDetect(dtm_coffee_byReview))
+merged_topic_headphone <- dtm_join(dtm_headphone_brand, dtm_docDetect(dtm_headphone_byReview))
 
 # COUNT BY REVIEW
 dtm_wordCounts <- function(input) {
@@ -70,19 +75,31 @@ dtm_apple_wordCounts <- dtm_wordCounts(dtm_apple_byReview)
 dtm_samsung_wordCounts <- dtm_wordCounts(dtm_samsung_byReview)
 dtm_toaster_wordCounts <- dtm_wordCounts(dtm_toaster_byReview)
 dtm_coffee_wordCounts <- dtm_wordCounts(dtm_coffee_byReview)
+dtm_headphone_wordCounts <- dtm_wordCounts(dtm_headphone_byReview)
 
 # CREATE DOCUMENT TERM MATRIX
 dtmCreator <- function(input) {
   input %>%
     cast_dtm(document, word, n)
 }
+
+# PRÜFEN WAS DAS IST?
+# dtmCreatorNN <- function(input) {
+#   input %>%
+#     cast_dtm(document, scoreNN, word, n)
+# }
+
 # Apply dtmCreator
 dtm_cellphone <- dtmCreator(dtm_cellphone_wordCounts)
+dtm_cellphoneNN <- dtmCreatorNN(dtm_cellphone_wordCounts)
 dtm_apple <- dtmCreator(dtm_apple_wordCounts)
 dtm_samsung <- dtmCreator(dtm_samsung_wordCounts)
 dtm_toaster <- dtmCreator(dtm_toaster_wordCounts)
 dtm_coffee <- dtmCreator(dtm_coffee_wordCounts)
+dtm_headphone <- dtmCreator(dtm_headphone_wordCounts)
 
+dtm_headphone_sparse <- removeSparseTerms(dtm_headphone, 0.97) #tm
+saveRDS(dtm_headphone, "output/dtm.rds")
 tidied_apple <- tidy(dtm_apple)
 
 # Train Model
@@ -109,6 +126,7 @@ LDA_reviews_apple <- createLDA(dtm_apple)
 LDA_reviews_samsung <- createLDA(dtm_samsung)
 LDA_reviews_toaster <- createLDA(dtm_toaster)
 LDA_reviews_coffee <- createLDA(dtm_coffee)
+LDA_reviews_headphone <- createLDA(dtm_headphone_sparse)
 
 LDA_reviews_cellphone <- as.matrix(topics(LDA_reviews_cellphone))
 write.csv(as.matrix(topics(LDA_reviews_coffee)),file="LDAGibbs5DocsToTopics_Coffee.csv")

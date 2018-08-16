@@ -1,4 +1,7 @@
+# categorizeData.R
+# Load required packages
 library(dplyr)
+
 ### CATEGORIZER
 # Function to join data
 joinData <- function(reviews, metadata) {
@@ -7,29 +10,18 @@ joinData <- function(reviews, metadata) {
   return(merged)
 }
 
-# ROUND AND ADD SENTIMENT SCORE FROM THE DEEP LEARNING MODEL
-addSentiScore <- function(sentiment) {
-  scoreRounded <- round(sentiment$Score, 5)
-  return(scoreRounded)
-}
-# Apply the function to the dataset
-prep_coffee_brand$scoreNN <- addSentiScore(score_coffee)
-prep_toaster_brand$scoreNN <- addSentiScore(score_toaster)
-prep_cellphone_brand$scoreNN <- addSentiScore(score_cellphone)
-prep_headphone_brand$scoreNN <- addSentiScore(score_headphone)
-
-
 ## PHONES
 # Filter based on sub-categories
 categorizeMetaPhone <- function(input) {
   input %>%
     filter(categories.0.0 == "Cell Phones & Accessories" & categories.0.1 == "Cell Phones" & categories.0.2 == "Unlocked Cell Phones")
 }
-# Apple Categorizer
+# Apply Categorizer
 meta_cellphone <- categorizeMetaPhone(meta_cellphone)
 # Apply inner_join
 merged_cellphone <- joinData(raw_cellphone, meta_cellphone)
-merged_cellphone$categories.0.3 <- merged_cellphone$categories.0.4 <- NULL
+# Remove all category columns
+merged_cellphone$categories.0.0 <- merged_cellphone$categories.0.1 <- merged_cellphone$categories.0.2 <- merged_cellphone$categories.0.3 <- merged_cellphone$categories.0.4 <- NULL
 
 ## HEADPHONES
 categorizeMetaHeadphones <- function(input) {
@@ -37,10 +29,11 @@ categorizeMetaHeadphones <- function(input) {
     filter(categories.0.0 == "Electronics" & categories.0.1 == "Accessories & Supplies" & categories.0.2 == "Audio & Video Accessories" & categories.0.3 == "Headphones")
 }
 # Apply Categorizer
-meta_electronics <- categorizeMetaHeadphones(meta_electronics)
+meta_headphone <- categorizeMetaHeadphones(meta_electronics)
 # Apply inner_join
 merged_headphone <- joinData(raw_headphone, meta_headphone)
-
+# Remove all category columns
+merged_headphone$categories.0.0 <- merged_headphone$categories.0.1 <- merged_headphone$categories.0.2 <- merged_headphone$categories.0.3 <- merged_headphone$categories.0.4 <- NULL
 
 ## COFFEE MACHINE
 categorizeMetaCoffee <- function(input) {
@@ -51,8 +44,7 @@ categorizeMetaCoffee <- function(input) {
 meta_coffee <- categorizeMetaCoffee(meta_homekitchen)
 # Apply inner_join
 merged_coffee <- joinData(raw_homekitchen, meta_coffee)
-merged_coffee$categories.0.3 <- merged_coffee$categories.0.4 <- NULL
-
+merged_coffee$categories.0.0 <- merged_coffee$categories.0.1 <- merged_coffee$categories.0.2 <- merged_coffee$categories.0.3 <- merged_coffee$categories.0.4 <- NULL
 
 ## TOASTERS
 categorizeMetaToaster <- function(input) {
@@ -63,7 +55,7 @@ categorizeMetaToaster <- function(input) {
 meta_toaster <- categorizeMetaToaster(meta_homekitchen)
 # Apply inner_join
 merged_toaster <- joinData(raw_homekitchen, meta_toaster)
-merged_toaster$categories.0.3 <- merged_toaster$categories.0.4 <- NULL
+merged_toaster$categories.0.0 <- merged_toaster$categories.0.1 <- merged_toaster$categories.0.2 <- merged_toaster$categories.0.3 <- merged_toaster$categories.0.4 <- NULL
 
 # Most Common Brands
 countBrands <- function(input){

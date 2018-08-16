@@ -8,21 +8,7 @@ ggplot(data=metadata, aes(metadata$price, na.rm = TRUE)) +
   labs(title="Prices for Smartphones") +
   labs(x="Price  in US$", y="Amount of Products")
 
-# Density Histogram Price 
-ggplot(data=metadata, aes(metadata$price, na.rm = TRUE)) + 
-  geom_histogram(aes(y =..density..)) +
-  geom_density(col = 4) + 
-  theme(strip.text=element_text(size=11)) +
-  labs(title="Prices for Smartphones") +
-  labs(x="Price in $", y="Amount of Products")
 
-# Histogram Star Ratings
-ggplot(data=merged_branded_full, aes(overall, na.rm = TRUE)) + 
-  geom_histogram() +
-  #geom_density() + 
-#  theme(strip.text=element_text(size=11)) +
-  labs(title="Distrubition of Star Ratings") +
-  labs(x="Price", y="Amount of Products")
 
 # SENTIMENT COUNT PLOT
 plotSentiCount <- function(input, title) {
@@ -87,3 +73,9 @@ diversity_plot <- lexDiv_Cellphone %>%
   scale_color_manual(values = "blue") +
   theme_classic() +
   theme_lyrics()
+
+
+
+# PLOT OVERALL VS SENTISCORE
+ggplot(merged_topic_cellphone, aes(x=overall, y=scoreNN)) +
+  geom_point(size=2, shape=23)

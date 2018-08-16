@@ -1,13 +1,5 @@
-# HISTOGRAMS ON EVALUATION
-plotHistogram <- function(input, title) {
-  hist(input$overall, main = paste("Histogram of", title, sep = " "))
-}
-# Apply histogram to datasets
-plotHistogram(prep_coffee_brand, "Coffee Reviews")
-plotHistogram(prep_toaster_brand, "Toaster Reviews")
-plotHistogram(prep_cellphone_brand, "Cellphone Reviews")
-plotHistogram(prep_headphone_brand, "Headphone Reviews")
-
+# textBigram.R
+library(tidyr)
 ### TOKENIZE THE INPUT DATA
 tokenizeBigram <- function(input) {
   input %>% unnest_tokens(bigram, review, token = "ngrams", n = 2)
@@ -69,14 +61,15 @@ countBigramHeadphone <- countBigram(tokenized_headphone_bigram_united)
 countBigramToaster <-countBigram(tokenized_toaster_bigram_united)
 countBigramCoffee <- countBigram(tokenized_coffee_bigram_united)
 
-### FILTER BIGRAM FOR BATTERY LIFE E.G
-filterBigramWord <- function(input, token1, token2) {
-  input %>%
-  filter(w1 == token1 & w2 == token2) %>%
-    count(w1, w2, sort = TRUE)
-}
-# Apply manual Bigram Filter
-filterBigramWord(tokenized_cellphone_bigram, "poor", "performance")
+# ### FILTER BIGRAM FOR BATTERY LIFE E.G
+# PRÜFEN: JUCKT NICHT WIRKLICH
+# filterBigramWord <- function(input, token1, token2) {
+#   input %>%
+#   filter(w1 == token1 & w2 == token2) %>%
+#     count(w1, w2, sort = TRUE)
+# }
+# # Apply manual Bigram Filter
+# filterBigramWord(tokenized_headphone_bigram, "poor", "performance")
 
 ### FILTER FOR NEGATIONS
 filterBigramNot <- function(input) {
@@ -100,7 +93,7 @@ sentimentNotWords <- function(input) {
     ungroup()
 }
 # Apply sentimentNotWords Function
-sentimentNotWords(filterBigramNot(tokenized_cellphone_bigram))
+sentimentNotWords(filterBigramNot(tokenized_headphone_bigram))
 
 ### PLOT THE NEGATE-WORDS
 tokenized_bigram_counts <- function(input, selectBrand) {
@@ -126,7 +119,7 @@ tokenized_bigram_counts_toaster <- tokenized_bigram_counts(prep_toaster_brand, "
 # PLOT NEGATE WORDS
 plotNotWords <- function(input, text) {
   input %>%
-    filter(word1 %in% c("not", "without", "no", "poor")) %>%
+    filter(word1 %in% c("not")) %>%
     count(word1, word2, wt = n, sort = TRUE) %>%
     inner_join(get_sentiments("afinn"), by = c(word2 = "word")) %>%
     mutate(contribution = score * nn) %>%
@@ -145,7 +138,8 @@ plotNotWords <- function(input, text) {
     ggtitle(paste("Negate-Words for", text, sep = " "))
 }
 # Apply it to the datasets
-plotNotWords(tokenized_bigram_counts(prep_headphone_brand, "beats"), "Headphones")
+plotNotWords(tokenized_bigram_counts(prep_headphone_brand, ""), "Headphones")
+plotNotWords(tokenized_bigram_counts(prep_headphone_brand, "beats"), "Headphones, Brand 'Beats'")
 plotNotWords(tokenized_bigram_counts(merged_topic_cellphone, ""), "Cellphones")
 plotNotWords(tokenized_bigram_counts(merged_topic_cellphone, "samsung"), "Cellphones, Brand 'Samsung'")
 plotNotWords(tokenized_bigram_counts(merged_topic_cellphone, "apple"), "Cellphones, Brand 'Apple'")

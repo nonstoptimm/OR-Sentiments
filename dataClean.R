@@ -1,3 +1,6 @@
+# dataCleaning.R
+# Script to clean the data
+# Required Packages
 library(tidyverse)
 library(textstem)
 
@@ -38,6 +41,7 @@ merged_coffee <- deleteNotEnglish(merged_coffee)
 merged_toaster <- deleteNotEnglish(merged_toaster)
 
 # CORRECT CONTRACTIONS
+# Here we use the contraction_list imported in importData.R
 correctContraction <- function(reviews, contraction_list) {
   for(pattern in 1:nrow(contraction_list)) {
     reviews <- gsub(contraction_list$contraction[pattern], contraction_list$full[pattern], reviews, ignore.case =TRUE)
@@ -61,7 +65,9 @@ prep_toaster_brand$review <- correctWord(prep_toaster_brand$review, "toaster", "
 # REMOVE PUNCTUATION AND STUFF
 removePunctuation <- function(reviews) {
   reviews <- gsub("&#8217;", "'", reviews)
+  # Dollar should not be deleted because it might be relevant regarding purchase
   reviews <- gsub("\\$", " dollar ", reviews)
+  # Percent should not be deleted because it might be relevant regarding battery gauge
   reviews <- gsub("\\%", " percent ", reviews)
   reviews <- gsub("\\W", " ", reviews)
   return(reviews)
@@ -71,12 +77,6 @@ merged_cellphone_brand$review <- removePunctuation(merged_cellphone_brand$review
 merged_coffee_brand$review <- removePunctuation(merged_coffee_brand$review)
 merged_headphone_brand$review <- removePunctuation(merged_headphone_brand$review)
 merged_toaster_brand$review <- removePunctuation(merged_toaster_brand$review)
-
-# Detect Incorrect Words
-detectIncorrect <- function(input) {
-  incorrectWords <- lapply(input, hunspell_check)
-  return(incorrectWords)
-} 
 
 # Word Stemming/Lemmatize
 lemmatizeText <- function(input) {

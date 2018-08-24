@@ -10,6 +10,8 @@ saveLDA(LDA_reviews_apple, "LDA_reviews_apple")
 saveLDA(LDA_reviews_samsung, "LDA_reviews_samsung")
 saveLDA(LDA_reviews_coffee, "LDA_reviews_coffee")
 saveLDA(LDA_reviews_toaster, "LDA_reviews_toaster")
+saveLDA(LDA_reviews_headphone, "LDA_reviews_headphone")
+saveLDA(xgb_fit, "xgb_fit1")
 
 # PREPARED DATA
 saveData <- function(input, filename){
@@ -20,6 +22,7 @@ saveData(prep_headphone_brand, "prep_headphone_brand-clean")
 saveData(prep_cellphone_brand, "prep_cellphone_brand-clean")
 saveData(prep_toaster_brand, "prep_toaster_brand-clean")
 saveData(prep_coffee_brand, "prep_coffee_brand-clean")
+saveData(importance_vars, "importance_vars")
 
 # Cut all category columns and description, as it is unnecessary
 prep_coffee_brand$description <- prep_coffee_brand$categories.0.0 <- prep_coffee_brand$categories.0.1 <- prep_coffee_brand$categories.0.2 <- NULL

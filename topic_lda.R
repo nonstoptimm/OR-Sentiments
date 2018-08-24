@@ -38,6 +38,7 @@ dtm_toaster_byReview <- dtm_wordByReview(dtm_toaster_brand)
 dtm_headphone_byReview <- dtm_wordByReview(dtm_headphone_brand)
 
 # REMOVE STOPWORDS
+# Had to be done 
 dtm_docDetect <- function(input) {
   input %>%
     anti_join(stop_words) %>%
@@ -136,6 +137,7 @@ LDAProb_CellphoneApple <- as.data.frame(LDA_reviews_apple@gamma)
 LDAProb_CellphoneSamsung <- as.data.frame(LDA_reviews_samsung@gamma)
 LDAProb_Toaster <- as.data.frame(LDA_reviews_toaster@gamma)
 LDAProb_Coffee <- as.data.frame(LDA_reviews_coffee@gamma)
+LDAProb_Headphone<- as.data.frame(LDA_reviews_headphone@gamma)
 
 # CREATE PROPER COLNAMES
 scoreCols <- function(input) {
@@ -149,6 +151,7 @@ LDAProb_CellphoneApple <- scoreCols(LDAProb_CellphoneApple)
 LDAProb_CellphoneSamsung <- scoreCols(LDAProb_CellphoneSamsung)
 LDAProb_Toaster <- scoreCols(LDAProb_Toaster)
 LDAProb_Coffee <- scoreCols(LDAProb_Coffee)
+LDAProb_Headphone <- scoreCols(LDAProb_Headphone)
 
 write.csv(as.data.frame(LDA_reviews_coffee@gamma),file="LDAGibbs5TopicProbabilities_CellphoneCoffee.csv")
 
@@ -162,6 +165,7 @@ lda_apple_wtp <- topic_wtp(LDA_reviews_apple)
 lda_samsung_wtp <- topic_wtp(LDA_reviews_samsung)
 lda_toaster_wtp <- topic_wtp(LDA_reviews_toaster)
 lda_coffee_wtp <- topic_wtp(LDA_reviews_coffee)
+lda_headphone_wtp <- topic_wtp(LDA_reviews_headphone)
 
 # LDA TOP TERMS
 LDATopTerms <- function(input) {
@@ -177,6 +181,7 @@ lda_apple_wtp_topTerms <- LDATopTerms(lda_apple_wtp)
 lda_samsung_wtp_topTerms <- LDATopTerms(lda_samsung_wtp)
 lda_toaster_wtp_topTerms <- LDATopTerms(lda_toaster_wtp)
 lda_coffee_wtp_topTerms <- LDATopTerms(lda_coffee_wtp)
+lda_headphone_wtp_topTerms <- LDATopTerms(lda_headphone_wtp)
 
 # PLOT LDA TOP TERMS
 plotLDATopTerms <- function(input, topic) {
@@ -194,6 +199,7 @@ plotLDATopTerms(lda_apple_wtp_topTerms, "Phones, Brand Apple")
 plotLDATopTerms(lda_samsung_wtp_topTerms, "Phones, Brand Samsung")
 plotLDATopTerms(lda_toaster_wtp_topTerms, "Toaster")
 plotLDATopTerms(lda_coffee_wtp_topTerms, "Coffee")
+plotLDATopTerms(lda_headphone_wtp_topTerms, "Headphone")
 
 # PROBABILITIES ASSOCIATED WITH EACH TOPIC ASSIGNMENT
 LDAtopicProbs <- function(input){
@@ -205,6 +211,7 @@ LDAtopicProbs_CellphoneApple <- LDAtopicProbs(LDA_reviews_apple)
 LDAtopicProbs_CellphoneSamsung <- LDAtopicProbs(LDA_reviews_samsung)
 LDAtopicProbs_Toaster <- LDAtopicProbs(LDA_reviews_toaster)
 LDAtopicProbs_Coffee <- LDAtopicProbs(LDA_reviews_coffee)
+LDAtopicProbs_Headphone <- LDAtopicProbs(LDA_reviews_headphone)
 
 
 # # RELATIVE IMPORTANCE MOST IMPORTANT TOPICS
@@ -230,6 +237,7 @@ merged_topic_apple <- addLDAvalues(merged_topic_apple, LDAProb_CellphoneApple)
 merged_topic_samsung <- addLDAvalues(merged_topic_samsung, LDAProb_CellphoneSamsung)
 merged_topic_toaster <- addLDAvalues(merged_topic_toaster, LDAProb_Toaster)
 merged_topic_coffee <- addLDAvalues(merged_topic_coffee, LDAProb_Coffee)
+merged_topic_headphone <- addLDAvalues(merged)
 
 # CALCULATE AND ASSIGN VALUES
 topicReviewScore <- function(x, y) {

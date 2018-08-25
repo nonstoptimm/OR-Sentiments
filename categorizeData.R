@@ -57,22 +57,29 @@ meta_toaster <- categorizeMetaToaster(meta_homekitchen)
 merged_toaster <- joinData(raw_homekitchen, meta_toaster)
 merged_toaster$categories.0.0 <- merged_toaster$categories.0.1 <- merged_toaster$categories.0.2 <- merged_toaster$categories.0.3 <- merged_toaster$categories.0.4 <- NULL
 
-# Most Common Brands
-countBrands <- function(input){
-  input %>%
-    group_by(brand) %>% 
-    summarise(num_words = n()) %>% 
-    arrange(desc(num_words))
+# DETECT REVIEW LANGUAGE
+detectLanguage <- function(input) {
+  langProfile <- TC_byte_profiles[names(TC_byte_profiles) %in% c("english", "french", "spanish", "german", "italian", "portuguese")]
+  reviewLanguage <- textcat(input, p = langProfile)
+  return(reviewLanguage)
 }
-# See What's In it
-countBrands(merged_cellphone)
-countBrands(merged_cellphone_brand)
-countBrands(merged_headphone)
-countBrands(merged_headphone_brand)
-countBrands(merged_coffee)
-countBrands(merged_coffee_brand)
-countBrands(merged_toaster)
-countBrands(merged_toaster_brand)
+# Apply detectLanguage Function
+merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
+merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
+merged_coffee$reviewLanguage <- detectLanguage(merged_coffee$review)
+merged_toaster$reviewLanguage <- detectLanguage(merged_toaster$review)
+
+# DELETE ALL NON-ENGLISH REVIEWS
+deleteNotEnglish <- function(input) {
+  input %>%
+    filter(reviewLanguage == "english") %>% # filter for english reviews
+    select(-reviewLanguage) # Remove the language column again, as it is no longer needed
+}
+# Apply deleteNotEnglish Function
+merged_cellphone <- deleteNotEnglish(merged_cellphone)
+merged_headphone <- deleteNotEnglish(merged_headphone)
+merged_coffee <- deleteNotEnglish(merged_coffee)
+merged_toaster <- deleteNotEnglish(merged_toaster)
 
 ## Branded Reviews Only
 categorizeOnlyBranded <- function(input){

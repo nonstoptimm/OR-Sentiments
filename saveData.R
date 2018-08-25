@@ -1,6 +1,21 @@
+# saveData.R
 # OBJECT WRITER 
+library(data.table)
+
+# PREPARED DATA
+# Function to write prepared data and any type of table on the disk as .csv
+saveData <- function(input, filename){
+  fwrite(input, paste("output/", filename, ".csv", sep=""))  
+}
+# Apply saveData Function
+saveData(prep_headphone_brand, "prep_headphone_brand-clean")
+saveData(prep_cellphone_brand, "prep_cellphone_brand-clean")
+saveData(prep_toaster_brand, "prep_toaster_brand-clean")
+saveData(prep_coffee_brand, "prep_coffee_brand-clean")
+saveData(importance_vars2, "importance_vars2-noProgress")
 
 # TOPIC MODELS
+# Function to write topic models on the disk
 saveLDA <- function(input, filename) {
   saveRDS(input, paste("output/", filename, ".rds", sep=""))
 }
@@ -11,18 +26,7 @@ saveLDA(LDA_reviews_samsung, "LDA_reviews_samsung")
 saveLDA(LDA_reviews_coffee, "LDA_reviews_coffee")
 saveLDA(LDA_reviews_toaster, "LDA_reviews_toaster")
 saveLDA(LDA_reviews_headphone, "LDA_reviews_headphone")
-saveLDA(xgb_fit, "xgb_fit1")
-
-# PREPARED DATA
-saveData <- function(input, filename){
-  fwrite(input, paste("output/", filename, ".csv", sep=""))  
-}
-# Apply saveData Function
-saveData(prep_headphone_brand, "prep_headphone_brand-clean")
-saveData(prep_cellphone_brand, "prep_cellphone_brand-clean")
-saveData(prep_toaster_brand, "prep_toaster_brand-clean")
-saveData(prep_coffee_brand, "prep_coffee_brand-clean")
-saveData(importance_vars, "importance_vars")
+saveLDA(xgb_fit, "xgb_fit-noProgress")
 
 # Cut all category columns and description, as it is unnecessary
 prep_coffee_brand$description <- prep_coffee_brand$categories.0.0 <- prep_coffee_brand$categories.0.1 <- prep_coffee_brand$categories.0.2 <- NULL

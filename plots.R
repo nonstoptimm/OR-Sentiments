@@ -1,5 +1,6 @@
 # GGPLOTS
 library(ggplot2)
+library(dplyr)
 
 # Histogram Price in $
 ggplot(data=metadata, aes(metadata$price, na.rm = TRUE)) + 
@@ -7,8 +8,6 @@ ggplot(data=metadata, aes(metadata$price, na.rm = TRUE)) +
   theme(strip.text=element_text(size=11)) +
   labs(title="Prices for Smartphones") +
   labs(x="Price  in US$", y="Amount of Products")
-
-
 
 # SENTIMENT COUNT PLOT
 plotSentiCount <- function(input, title) {
@@ -73,7 +72,6 @@ diversity_plot <- lexDiv_Cellphone %>%
   scale_color_manual(values = "blue") +
   theme_classic() +
   theme_lyrics()
-
 
 
 # PLOT OVERALL VS SENTISCORE

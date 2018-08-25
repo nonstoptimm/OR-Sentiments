@@ -97,8 +97,6 @@ wf_headphone_brand <- countWordsBrand(tokenized_headphone, c("headphone", "buy")
 #}
 #tf_idf_general(wf_headphone)
 
-
-
 # Function for plotting 
 getSentimentPlot <- function(input) {
   input %>%

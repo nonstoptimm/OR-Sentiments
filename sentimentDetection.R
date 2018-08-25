@@ -1,11 +1,12 @@
 ### SENTIMENT ###
 # sentimentDetection.R
+library(dplyr)
 
 # Function for getting Lexicon-based Sentiment
 getSentiment <- function(input, lexicon) {
   input %>%
-    inner_join(get_sentiments(lexicon)) %>%
-    count(word, sentiment, sort = TRUE) %>%
+    inner_join(get_sentiments(lexicon)) %>% # join to sentiment lexicon
+    count(word, sentiment, sort = TRUE) %>% # count sentiment hits
     ungroup()
 }
 # Get Sentiments for Unigrams
@@ -19,6 +20,7 @@ getSentiment(tokenized_cellphone, "bing")
 getSentiment(tokenized_cellphone, "nrc")
 
 # Calculate Sentiment Score for AFINN
+# Here, another function is necessary as we have to compute values
 sentimentScoreAFINN <- function(input) {
   input %>%
     inner_join(get_sentiments("afinn"), by = "word") %>%

@@ -1,3 +1,4 @@
+#testit
 ### SENTIMENT ###
 # sentimentDetection.R
 library(dplyr)
@@ -47,25 +48,10 @@ plotSentimentScoreAFINN <- function(input, num, text) {
 }
 # Apply plotSentimentScoreAFINN Function
 plotSentimentScoreAFINN(scoreCellphoneAFINN, 80, "Cellphones")
-plotSentimentScoreAFINN(scoreHeadphoneAFINN, 500, "Headphones")
+plotSentimentScoreAFINN(scoreHeadphoneAFINN, 700, "Headphones")
 plotSentimentScoreAFINN(scoreToasterAFINN, 80, "Toaster")
 plotSentimentScoreAFINN(scoreCoffeeAFINN, 200, "Coffee")
             
-# SENTIMENT CONTRIBUTION
-# EHER NICHT VERWENDEN
-#sentiContributions <- function(input) {
-#  input %>%
-#  inner_join(get_sentiments("afinn"), by = "word") %>%
-#  group_by(word) %>%
-#  summarize(occurences = n(),
-#            contribution = sum(score))
-#}
-# Apply sentiContributions Function
-#sentiContributions(tokenized_headphone)
-#sentiContributions(tokenized_cellphone)
-#sentiContributions(tokenized_coffee)
-#sentiContributions(tokenized_toaster)
-
 # SENTIMENT CONTRIBUTION FOR BRANDED PRODUCTS
 # sentiContributionsBrand <- function(input, selectBrand) {
 #   input %>%
@@ -103,15 +89,15 @@ sentiContributionPlot(sentiContributionsBrand(tokenized_cellphone, "apple"), "Ce
 sentiContributionPlot(sentiContributions(tokenized_coffee), "Coffee")
 sentiContributionPlot(sentiContributions(tokenized_toaster), "Toaster")
 
-### SENTIMENT BY REVIEW
+# LEXICON-BASED SENTIMENT BY REVIEW
+# Calculate Sentiment Score for every Review
 sentimentReview <- function(input) {
   input %>%
   inner_join(get_sentiments("afinn"), by = "word") %>%
   group_by(asin, reviewerID, scoreNN, overall, title) %>%
   summarize(sentiment = mean(score),
             words = n()) %>%
-  ungroup() %>%
-  filter(words >= 5)
+  ungroup()
 }
 # Apply sentimentReview Function
 sentimentReviewCellphone <- sentimentReview(tokenized_cellphone)

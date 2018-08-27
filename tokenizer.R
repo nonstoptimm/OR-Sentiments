@@ -1,16 +1,18 @@
 # textBigram.R
 library(tidyr)
-### TOKENIZE THE INPUT DATA
+
+# TOKENIZE THE INPUT DATA INTO BIGRAMS
 tokenizeBigram <- function(input) {
-  input %>% unnest_tokens(bigram, review, token = "ngrams", n = 2)
+  input %>% 
+    unnest_tokens(bigram, review, token = "ngrams", n = 2) # bigram is n = 2
 }
 # Apply it to text data
-tokenized_toaster_bigram <- tokenizeBigram(prep_toaster_brand)
 tokenized_headphone_bigram <- tokenizeBigram(prep_headphone_brand)
+tokenized_toaster_bigram <- tokenizeBigram(prep_toaster_brand)
 tokenized_cellphone_bigram <- tokenizeBigram(prep_cellphone_brand)
 tokenized_coffee_bigram <- tokenizeBigram(prep_coffee_brand)
 
-### COUNTING WORDS (FUNCTION FOR WITH AND WITHOUT STOPWORDS)
+# COUNTING WORDS (FUNCTION FOR WITH AND WITHOUT STOPWORDS)
 countBigram <- function(input) {
   input %>%
     count(bigram, sort = TRUE)
@@ -21,7 +23,7 @@ countBigram(tokenized_headphone_bigram)
 countBigram(tokenized_coffee_bigram)
 countBigram(tokenized_toaster_bigram)
 
-### SEPARATE BIGRAMS
+# SEPARATE BIGRAMS
 separateBigrams <- function(input) {
   input %>%
     separate(bigram, c("w1", "w2"), sep = " ")
@@ -32,29 +34,29 @@ tokenized_toaster_bigram <- separateBigrams(tokenized_toaster_bigram)
 tokenized_coffee_bigram <- separateBigrams(tokenized_coffee_bigram)
 tokenized_headphone_bigram <- separateBigrams(tokenized_headphone_bigram)
 
-### FILTER BIGRAMS
+# REMOVE STOPWORDS FROM BIGRAMS
 filterBigrams <- function(input) {
   input %>%
     filter(!w1 %in% stop_words$word) %>%
     filter(!w2 %in% stop_words$word)
 }
 # Apply Bigram Filter
+tokenized_headphone_bigram_filtered <- filterBigrams(tokenized_headphone_bigram)
 tokenized_cellphone_bigram_filtered <- filterBigrams(tokenized_cellphone_bigram)
 tokenized_coffee_bigram_filtered <- filterBigrams(tokenized_coffee_bigram)
 tokenized_toaster_bigram_filtered <- filterBigrams(tokenized_toaster_bigram)
-tokenized_headphone_bigram_filtered <- filterBigrams(tokenized_headphone_bigram)
 
-#### UNITE THE WORDS / GLUE BACK TOGETHER
+# UNITE THE WORDS / GLUE BACK TOGETHER
 uniteBigrams <- function(input) {
   input %>% unite(bigram, w1, w2, sep = " ")
 }
 # Apply Glue
-tokenized_cellphone_bigram_united <- uniteBigrams(tokenized_cellphone_bigram_filtered)
 tokenized_headphone_bigram_united <- uniteBigrams(tokenized_headphone_bigram_filtered)
+tokenized_cellphone_bigram_united <- uniteBigrams(tokenized_cellphone_bigram_filtered)
 tokenized_coffee_bigram_united <- uniteBigrams(tokenized_coffee_bigram_filtered)
 tokenized_toaster_bigram_united <- uniteBigrams(tokenized_toaster_bigram_filtered)
 
-### COUNTING WITHOUT STOPWORDS
+# COUNTING WITHOUT STOPWORDS
 # just apply countBigram again
 countBigramCellphone <- countBigram(tokenized_cellphone_bigram_united)
 countBigramHeadphone <- countBigram(tokenized_headphone_bigram_united)
@@ -71,7 +73,7 @@ countBigramCoffee <- countBigram(tokenized_coffee_bigram_united)
 # # Apply manual Bigram Filter
 # filterBigramWord(tokenized_headphone_bigram, "poor", "performance")
 
-### FILTER FOR NEGATIONS
+# FILTER FOR NEGATIONS
 filterBigramNot <- function(input) {
   input %>%
   filter(w1 == "not") %>%
@@ -98,15 +100,17 @@ sentimentNotWords(filterBigramNot(tokenized_headphone_bigram))
 ### PLOT THE NEGATE-WORDS
 tokenized_bigram_counts <- function(input, selectBrand) {
   if(selectBrand != "") {
-    cellphone_bigrams <- input %>% filter(brand == selectBrand)
-    cellphone_bigrams <- cellphone_bigrams %>%
+    bigrams <- input %>% filter(brand == selectBrand)
+    bigrams <- bigrams %>%
       unnest_tokens(bigram, review, token = "ngrams", n = 2)
   } else {
-    cellphone_bigrams <- input %>%
+    bigrams <- input %>%
       unnest_tokens(bigram, review, token = "ngrams", n = 2)
   }
-  cellphone_bigrams %>%
-  count(categories.0.2, bigram, sort = TRUE) %>%
+  catcolumn <- as.data.frame(rep("i", nrow(bigrams)))
+  bigrams$cat <- catcolumn
+  bigrams %>%
+  count(cat, bigram, sort = TRUE) %>%
   ungroup() %>%
   separate(bigram, c("word1", "word2"), sep = " ")
 }

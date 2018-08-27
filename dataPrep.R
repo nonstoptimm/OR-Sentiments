@@ -14,6 +14,8 @@ prepColumns <- function(input) {
   input$overall <- as.integer(input$overall)
   # Substitute "&amp;" in Brand Names
   input$title <- gsub("\\&amp;", " ", input$title)
+  # Create ID for each document, combining asin and reviewerID
+  input$document <- paste(input$asin, input$reviewerID, sep = "-") 
   return(input)
 }
 # Apply prepColumns
@@ -52,6 +54,7 @@ prep_toaster_brand$scoreNN <- addSentiScore(score_toaster)
 prep_cellphone_brand$scoreNN <- addSentiScore(score_cellphone)
 prep_headphone_brand$scoreNN <- addSentiScore(score_headphone)
 
+# CONVERT DATA INTO TIBBLE FORMAT
 # Make as tibble, otherwise they can't be proceeded by the tidy tokenizer
 makeTibble <- function(input){
   as_tibble(input)

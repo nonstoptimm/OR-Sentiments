@@ -8,7 +8,7 @@ createID <- function(input){
   document <- paste(input$asin, input$reviewerID, sep = "-") 
   return(document)
 }
-# Apply dtm_toaster_brand Function
+# Apply Function
 dtm_toaster_brand$document <- createID(dtm_toaster_brand)
 dtm_cellphone_brand$document <- createID(dtm_cellphone_brand)
 dtm_coffee_brand$document <- createID(dtm_coffee_brand)

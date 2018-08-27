@@ -42,7 +42,7 @@ correctWord <- function(input, before, after) {
 # Apply correctWord Function
 prep_toaster_brand$review <- correctWord(prep_toaster_brand$review, "toaster", "toast")
 
-# REMOVE PUNCTUATION
+# REMOVE PUNCTUATION AND CORRECT FURTHER SIGNS
 removePunctuation <- function(reviews) {
   # Substitute colon to a standardized one
   reviews <- gsub("&#8217;", "'", reviews)
@@ -58,6 +58,17 @@ merged_cellphone_brand$review <- removePunctuation(merged_cellphone_brand$review
 merged_coffee_brand$review <- removePunctuation(merged_coffee_brand$review)
 merged_headphone_brand$review <- removePunctuation(merged_headphone_brand$review)
 merged_toaster_brand$review <- removePunctuation(merged_toaster_brand$review)
+
+# SUBSTITUTE "&" IN TITLE AND BRAND
+correctAnd <- function(input) {
+  input <- gsub("\\&amp;", "&", input)
+  return(input)
+}
+# Apply correctAnd Function
+merged_cellphone_brand$title <- gsub("\\&amp;", "&", merged_cellphone_brand$title)
+merged_cellphone_brand$brand <- gsub("\\&amp;", "&", merged_cellphone_brand$brand)
+prep_toaster_brand$title <- gsub("\\&amp;", "&", prep_toaster_brand$title)
+prep_toaster_brand$brand <- gsub("\\&amp;", "&", prep_toaster_brand$brand)
 
 # WORD LEMMATIZATION
 lemmatizeText <- function(input) {

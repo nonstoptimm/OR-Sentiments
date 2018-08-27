@@ -1,18 +1,11 @@
+# topicLDA.R
+# TOPIC MODELING
+# Load required packages
 library(topicmodels)
 library(purrr)
 library(dplyr)
 library(tidyverse)
 library(tidytext)
-# CREATE ID FOR TOPIC MODEL TO MERGE THE TOPIC MODEL IT LATER
-createID <- function(input){
-  document <- paste(input$asin, input$reviewerID, sep = "-") 
-  return(document)
-}
-# Apply Function
-dtm_toaster_brand$document <- createID(dtm_toaster_brand)
-dtm_cellphone_brand$document <- createID(dtm_cellphone_brand)
-dtm_coffee_brand$document <- createID(dtm_coffee_brand)
-dtm_headphone_brand$document <- createID(dtm_headphone_brand)
 
 # FILTER FOR SPECIAL BRAND
 dtm_filterBrand <- function(input, selectBrand) {
@@ -283,3 +276,14 @@ merged_topic_coffee <- topicReviewScore(merged_topic_coffee)
 # Create Boxplot for Overall Star Rating vs. Sentiment Score
 boxplot(Topic1 + Topic2 + Topic3 + Topic4 + Topic5~cyl,data=mtcars, main="Car Milage Data", 
         xlab="Number of Cylinders", ylab="Miles Per Gallon")
+
+# # CREATE ID FOR TOPIC MODEL TO MERGE THE TOPIC MODEL IT LATER
+# createID <- function(input){
+#   document <- paste(input$asin, input$reviewerID, sep = "-") 
+#   return(document)
+# }
+# # Apply Function
+# dtm_toaster_brand$document <- createID(dtm_toaster_brand)
+# dtm_cellphone_brand$document <- createID(dtm_cellphone_brand)
+# dtm_coffee_brand$document <- createID(dtm_coffee_brand)
+# dtm_headphone_brand$document <- createID(dtm_headphone_brand)

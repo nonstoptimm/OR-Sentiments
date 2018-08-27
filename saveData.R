@@ -1,6 +1,8 @@
 # saveData.R
 # OBJECT WRITER 
+# Load required packages
 library(data.table)
+library(xgboost)
 
 # PREPARED DATA
 # Function to write prepared data and any type of table on the disk as .csv
@@ -14,7 +16,7 @@ saveData(prep_toaster_brand, "prep_toaster_brand-clean")
 saveData(prep_coffee_brand, "prep_coffee_brand-clean")
 saveData(importance_vars2, "importance_vars2-noProgress")
 
-# TOPIC MODELS
+# SAVE TOPIC MODELS
 # Function to write topic models on the disk
 saveLDA <- function(input, filename) {
   saveRDS(input, paste("output/", filename, ".rds", sep=""))
@@ -26,10 +28,10 @@ saveLDA(LDA_reviews_samsung, "LDA_reviews_samsung")
 saveLDA(LDA_reviews_coffee, "LDA_reviews_coffee")
 saveLDA(LDA_reviews_toaster, "LDA_reviews_toaster")
 saveLDA(LDA_reviews_headphone, "LDA_reviews_headphone")
-saveLDA(xgb_fit, "xgb_fit-noProgress")
 
-# Cut all category columns and description, as it is unnecessary
-prep_coffee_brand$description <- prep_coffee_brand$categories.0.0 <- prep_coffee_brand$categories.0.1 <- prep_coffee_brand$categories.0.2 <- NULL
-prep_toaster_brand$description <- prep_toaster_brand$categories.0.0 <- prep_toaster_brand$categories.0.1 <- prep_toaster_brand$categories.0.2 <- NULL
-prep_cellphone_brand$description <- prep_cellphone_brand$categories.0.0 <- prep_cellphone_brand$categories.0.1 <- prep_cellphone_brand$categories.0.2 <- NULL
-prep_headphone_brand$description <- prep_headphone_brand$categories.0.0 <- prep_headphone_brand$categories.0.1 <- prep_headphone_brand$categories.0.2 <- NULL
+# SAVE XGBOOST
+saveXG <- function(input, filename){
+  xgb.save(input, paste("output/", filename, sep=""))
+}
+# Apply saveXG Function
+saveXG(xgb_fit, "XG_Headphones")

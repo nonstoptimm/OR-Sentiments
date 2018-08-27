@@ -27,17 +27,14 @@ score_headphone <- read.csv("input-data/score_headphone.csv", header = TRUE, sep
 score_cellphone <- read.csv("input-data/score_cellphone.csv", header = TRUE, sep = ";")
 
 # IMPORT PREPARED DATASET
-prep_cellphone_brand <- fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_cellphone_brand-clean.csv")
-prep_coffee_brand <- fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_coffee_brand-clean.csv")
-prep_toaster_brand  <- fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_toaster_brand-clean.csv")
-prep_headphone_brand  <- fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_headphone_brand-clean.csv")
-prep_headphone_brand  <- fread("output/prep_headphone_brand-clean.csv")
-
-# MAKE IT AS TIBBLE
-prep_headphone_brand <- as_tibble(prep_headphone_brand)
-prep_cellphone_brand <- as_tibble(prep_cellphone_brand)
-prep_toaster_brand <- as_tibble(prep_toaster_brand)
-prep_coffee_brand <- as_tibble(prep_coffee_brand)
+prep_cellphone_brand <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_cellphone_brand-clean.csv"))
+prep_coffee_brand <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_coffee_brand-clean.csv"))
+prep_toaster_brand  <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_toaster_brand-clean.csv"))
+prep_headphone_brand  <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_headphone_brand-clean.csv"))
+prep_cellphone_brand <- as_tibble(fread("output//prep_cellphone_brand-clean.csv"))
+prep_coffee_brand <- as_tibble(fread("output/prep_coffee_brand-clean.csv"))
+prep_toaster_brand  <- as_tibble(fread("output/prep_toaster_brand-clean.csv"))
+prep_headphone_brand  <- as_tibble(fread("output/prep_headphone_brand-clean.csv"))
 
 # IMPORT THE CREATED TOPIC MODELS
 LDA_reviews_cellphone <- readRDS("output/LDA_reviews_cellphone.rds")
@@ -50,12 +47,6 @@ LDA_reviews_headphone <- readRDS("output/LDA_reviews_headphone.rds")
 xgb_fit <- readRDS("output/xgb_fit_noStopwords.rds")
 xgb_fit <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/xgb_fit-noProgress.rds")
 xgb_fit <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/xgb_fit-noProgress.rds")
-
-# IMPORT THE PREPARED DATA
-prep_coffee_brand$title <- gsub("\\&amp;", "&", prep_coffee_brand$title)
-prep_coffee_brand$brand <- gsub("\\&amp;", "&", prep_coffee_brand$brand)
-prep_toaster_brand$title <- gsub("\\&amp;", "&", prep_toaster_brand$title)
-prep_toaster_brand$brand <- gsub("\\&amp;", "&", prep_toaster_brand$brand)
 
 # CLEANUP - this command was sometimes really necessary as we're dealing with a huge amount of data
 rm(list=ls())

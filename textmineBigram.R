@@ -1,5 +1,8 @@
 # textBigram.R
+# Load required packages
+library(dplyr)
 library(tidyr)
+library(ggplot2)
 
 # TOKENIZE THE INPUT DATA INTO BIGRAMS
 tokenizeBigram <- function(input) {

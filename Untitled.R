@@ -93,3 +93,35 @@ score_toaster <- fread("input-data/score_toast.csv", showProgress = TRUE)
 score_coffee <- fread("input-data/score_coffee.csv", showProgress = TRUE)
 fwrite(score_headphone, "input-data/score_headphone.csv")
 score_headphone <- fread("input-data/score_headphone.csv", showProgress = TRUE)
+
+
+# CALCULATE TOTAL WORDS PER PRODUCT
+# Input must be wf for brands
+#totalWordsProduct <- function(input, brand){
+#  input %>% 
+#    filter(brand == brand) %>%
+#    group_by(title) %>% 
+#    summarize(total = sum(n))
+#} 
+# Apply function
+#headphoneProductWords <- totalWordsProduct(wf_headphone_brand)
+
+
+# REMOVE ADDITIONAL UNWANTED WORDS
+# removeUnwanted <- function(input, unwanted){
+#  input %>%
+#    anti_join(unwanted) # perform anti-join to individual words
+#} 
+# Apply to tokenized datasets
+# nothing yet
+
+# Count for DTM
+#countWordsDocument <- function(input) { 
+#  input %>%
+#    count(asin, reviewerID, word, sort = TRUE) %>%
+#    arrange(asin, reviewerID)
+#}
+# Apply Count for DTM
+#countWordsDocumentCellphone <- countWordsDocument(tokenized_cellphone)
+
+

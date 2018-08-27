@@ -1,27 +1,46 @@
-#testit
-### SENTIMENT ###
+# LEXICON-BASED SENTIMENT ANALYSIS
 # sentimentDetection.R
 library(dplyr)
 
-# Function for getting Lexicon-based Sentiment
+# GET SENTIMENT LABELS FOR BING OR NRC
+# Tokenized dataset as input and mention the lexicon
 getSentiment <- function(input, lexicon) {
   input %>%
     inner_join(get_sentiments(lexicon)) %>% # join to sentiment lexicon
     count(word, sentiment, sort = TRUE) %>% # count sentiment hits
     ungroup()
 }
-# Get Sentiments for Unigrams
+# Apply function to tokenized data set
+# Bing
 getSentiment(tokenized_coffee, "bing")
-getSentiment(tokenized_coffee, "nrc")
 getSentiment(tokenized_toaster, "bing")
-getSentiment(tokenized_toaster, "nrc")
 getSentiment(tokenized_headphone, "bing")
-getSentiment(tokenized_headphone, "nrc")
 getSentiment(tokenized_cellphone, "bing")
+# nrc
+getSentiment(tokenized_coffee, "nrc")
+getSentiment(tokenized_toaster, "nrc")
+getSentiment(tokenized_headphone, "nrc")
 getSentiment(tokenized_cellphone, "nrc")
 
-# Calculate Sentiment Score for AFINN
-# Here, another function is necessary as we have to compute values
+# LEXICON-BASED SENTIMENT BY REVIEW
+# Calculate Sentiment Score for every Review
+sentimentReview <- function(input) {
+  input %>%
+    inner_join(get_sentiments("afinn"), by = "word") %>%
+    group_by(asin, reviewerID, scoreNN, overall, title) %>%
+    summarize(sentiment = mean(score),
+              words = n()) %>%
+    ungroup()
+}
+# Apply sentimentReview FunctionBre
+sentimentReviewCellphone <- sentimentReview(tokenized_cellphone)
+sentimentReviewHeadphone <- sentimentReview(tokenized_headphone)
+sentimentReviewToaster <- sentimentReview(tokenized_toaster)
+sentimentReviewCoffee <- sentimentReview(tokenized_coffee)
+
+# SENTIMENT SCORE CALCULATION FOR AFINN
+# Here, a separate function is necessary as we have to compute numerical values
+# Word frequency as input
 sentimentScoreAFINN <- function(input) {
   input %>%
     inner_join(get_sentiments("afinn"), by = "word") %>%
@@ -52,6 +71,28 @@ plotSentimentScoreAFINN(scoreHeadphoneAFINN, 700, "Headphones")
 plotSentimentScoreAFINN(scoreToasterAFINN, 80, "Toaster")
 plotSentimentScoreAFINN(scoreCoffeeAFINN, 200, "Coffee")
             
+# PLOT SENTIMENT CONTRIBUTION
+sentiContributionPlot <- function(input, selectCategory) {
+  input %>%
+    top_n(25, abs(contribution)) %>%
+    mutate(word = reorder(word, contribution)) %>%
+    ggplot(aes(word, contribution, fill = contribution > 0)) +
+    geom_col(show.legend = FALSE) +
+    coord_flip() +
+    ggtitle(paste("Sentiment Contribution within", selectCategory, sep = " "))
+}
+# Apply sentiContributionPlot Function
+sentiContributionPlot(sentiContributions(tokenized_headphone), "Headphones")
+sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "beats"), "Cellphones for the brand Beats")
+sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "beyerdynamic"), "Cellphones for the brand Beyerdynamic")
+sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "sennheiser"), "Cellphones for the brand Sennheiser")
+sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "panasonic"), "Cellphones for the brand Panasonic")
+sentiContributionPlot(sentiContributions(tokenized_cellphone), "Cellphones")
+sentiContributionPlot(sentiContributionsBrand(tokenized_cellphone, "samsung"), "Cellphones for the brand Samsung")
+sentiContributionPlot(sentiContributionsBrand(tokenized_cellphone, "apple"), "Cellphones for the brand Apple")
+sentiContributionPlot(sentiContributions(tokenized_coffee), "Coffee")
+sentiContributionPlot(sentiContributions(tokenized_toaster), "Toaster")
+
 # SENTIMENT CONTRIBUTION FOR BRANDED PRODUCTS
 # sentiContributionsBrand <- function(input, selectBrand) {
 #   input %>%
@@ -67,40 +108,4 @@ plotSentimentScoreAFINN(scoreCoffeeAFINN, 200, "Coffee")
 # sentiContributionsBrand(tokenized_toaster, "")
 # sentiContributionsBrand(tokenized_coffee, "")
 
-# PLOT SENTIMENT CONTRIBUTION
-sentiContributionPlot <- function(input, selectCategory) {
-  input %>%
-  top_n(25, abs(contribution)) %>%
-  mutate(word = reorder(word, contribution)) %>%
-  ggplot(aes(word, contribution, fill = contribution > 0)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  ggtitle(paste("Sentiment Contribution within", selectCategory, sep = " "))
-}
-# Apply sentiContributionPlot Function
-sentiContributionPlot(sentiContributions(tokenized_headphone), "Headphones")
-sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "beats"), "Cellphones for the brand Beats")
-sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "beyerdynamic"), "Cellphones for the brand Beyerdynamic")
-sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "sennheiser"), "Cellphones for the brand Sennheiser")
-sentiContributionPlot(sentiContributionsBrand(tokenized_headphone, "panasonic"), "Cellphones for the brand Panasonic")
-sentiContributionPlot(sentiContributions(tokenized_cellphone), "Cellphones")
-sentiContributionPlot(sentiContributionsBrand(tokenized_cellphone, "samsung"), "Cellphones for the brand Samsung")
-sentiContributionPlot(sentiContributionsBrand(tokenized_cellphone, "apple"), "Cellphones for the brand Apple")
-sentiContributionPlot(sentiContributions(tokenized_coffee), "Coffee")
-sentiContributionPlot(sentiContributions(tokenized_toaster), "Toaster")
 
-# LEXICON-BASED SENTIMENT BY REVIEW
-# Calculate Sentiment Score for every Review
-sentimentReview <- function(input) {
-  input %>%
-  inner_join(get_sentiments("afinn"), by = "word") %>%
-  group_by(asin, reviewerID, scoreNN, overall, title) %>%
-  summarize(sentiment = mean(score),
-            words = n()) %>%
-  ungroup()
-}
-# Apply sentimentReview Function
-sentimentReviewCellphone <- sentimentReview(tokenized_cellphone)
-sentimentReviewHeadphone <- sentimentReview(tokenized_headphone)
-sentimentReviewToaster <- sentimentReview(tokenized_toaster)
-sentimentReviewCoffee <- sentimentReview(tokenized_coffee)

@@ -1,6 +1,7 @@
-# GGPLOTS
-library(ggplot2)
+# plotData.R
+# Load required packages
 library(dplyr)
+library(ggplot2)
 
 # Histogram Price in $
 ggplot(data=metadata, aes(metadata$price, na.rm = TRUE)) + 
@@ -12,17 +13,17 @@ ggplot(data=metadata, aes(metadata$price, na.rm = TRUE)) +
 # SENTIMENT COUNT PLOT
 plotSentiCount <- function(input, title) {
   input %>%
-  group_by(sentiment) %>%
-  top_n(10) %>%
-  ungroup() %>%
-  mutate(word = reorder(word, n)) %>%
-  ggplot(aes(word, n, fill = sentiment)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~sentiment, scales = "free_y") +
-  labs(y = "Contribution to sentiment",
-       x = NULL) +
-  ggtitle(title) +
-  coord_flip()
+    group_by(sentiment) %>%
+    top_n(10) %>%
+    ungroup() %>%
+    mutate(word = reorder(word, n)) %>%
+    ggplot(aes(word, n, fill = sentiment)) +
+    geom_col(show.legend = FALSE) +
+    facet_wrap(~sentiment, scales = "free_y") +
+    labs(y = "Contribution to sentiment",
+         x = NULL) +
+    ggtitle(title) +
+    coord_flip()
 }
 # Plot
 plotSentiCount(sentiment_coffee_bing, "Sentiment Count for Coffee Products")

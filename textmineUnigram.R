@@ -1,5 +1,5 @@
-# tidyData.R
-### DATA CLEANING IN CLEANING.R ###
+# textmineUnigram.R
+# Load required packages
 library(dplyr) 
 library(stringr)
 library(tidyr)
@@ -11,7 +11,6 @@ library(ggplot2)
 # Unnest the reviews to one word per row
 tokenizeReview <- function(input) {
   input %>%
-    # select(asin, overall, reviewTime, reviewerID, review, brand, price, title, scoreNN, document) %>%
     unnest_tokens(word, review)
 }
 # Apply it to datasets
@@ -61,8 +60,7 @@ wf_toaster_brand <- countWordsBrand(tokenized_toaster, c("toaster", "toast", "bu
 # CALCULATE TOTAL WORDS
 # Input must be wf for brands
 totalWords <- function(input){
-  summarized <- input %>% 
-    summarize(total = sum(n))
+  summarized <- input %>% summarize(total = sum(n))
   summarized <- as.data.frame(rep(as.numeric(summarized), nrow(input)))
   names(summarized) <- "total"
   return(summarized)
@@ -181,33 +179,3 @@ plotTFIDFbrand <- function(input, totalwords) {
 }
 # Apply Function
 plotTFIDFbrand(headphoneBrandTFIDF, 280000)
-
-# CALCULATE TOTAL WORDS PER PRODUCT
-# Input must be wf for brands
-#totalWordsProduct <- function(input, brand){
-#  input %>% 
-#    filter(brand == brand) %>%
-#    group_by(title) %>% 
-#    summarize(total = sum(n))
-#} 
-# Apply function
-#headphoneProductWords <- totalWordsProduct(wf_headphone_brand)
-
-
-# REMOVE ADDITIONAL UNWANTED WORDS
-# removeUnwanted <- function(input, unwanted){
-#  input %>%
-#    anti_join(unwanted) # perform anti-join to individual words
-#} 
-# Apply to tokenized datasets
-# nothing yet
-
-# Count for DTM
-#countWordsDocument <- function(input) { 
-#  input %>%
-#    count(asin, reviewerID, word, sort = TRUE) %>%
-#    arrange(asin, reviewerID)
-#}
-# Apply Count for DTM
-#countWordsDocumentCellphone <- countWordsDocument(tokenized_cellphone)
-

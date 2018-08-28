@@ -124,4 +124,21 @@ score_headphone <- fread("input-data/score_headphone.csv", showProgress = TRUE)
 # Apply Count for DTM
 #countWordsDocumentCellphone <- countWordsDocument(tokenized_cellphone)
 
+# sentimentDetection
+# SENTIMENT CONTRIBUTION FOR BRANDED PRODUCTS
+# sentiContributionsBrand <- function(input, selectBrand) {
+#   input %>%
+#     filter(brand == selectBrand) %>%
+#     inner_join(get_sentiments("afinn"), by = "word") %>%
+#     group_by(word) %>%
+#     summarize(occurences = n(),
+#               contribution = sum(score))
+# }
+# Apply sentiContributionsBrand Function
+# sentiContributionsBrand(tokenized_headphone, "beats")
+# sentiContributionsBrand(tokenized_cellphone, "apple")
+# sentiContributionsBrand(tokenized_toaster, "")
+# sentiContributionsBrand(tokenized_coffee, "")
+
+
 

@@ -34,4 +34,8 @@ saveXG <- function(input, filename){
   xgb.save(input, paste("output/", filename, sep=""))
 }
 # Apply saveXG Function
-saveXG(xgb_fit, "XG_Headphones")
+saveXG(xgbHeadphones, "XG_Headphones")
+saveXG(xgbCellphones, "XG_Cellphones")
+saveXG(xgbCoffee, "XG_Coffee")
+saveXG(xgbToaster, "XG_Toaster")
+

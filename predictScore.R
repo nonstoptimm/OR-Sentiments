@@ -24,17 +24,18 @@ sampleCoffee <- sampleData(prep_coffee_brand)
 sampleToaster <- sampleData(prep_toaster_brand)
 
 # PULL SAMPLE OF DATASET
-mediateHeadphone <- as_tibble(prep_headphone_brand[sampleHeadphone, ])
-mediateCellphone <- as_tibble(prep_cellphone_brand[sampleCellphone, ])
-mediateCoffee <- as_tibble(prep_coffee_brand[sampleCoffee, ])
-mediateToaster <- as_tibble(prep_toaster_brand[sampleToaster, ])
+mediateHeadphone <- as.tibble(prep_headphone_brand[sampleHeadphone, ])
+mediateCellphone <- as.tibble(prep_cellphone_brand[sampleCellphone, ])
+mediateCoffee <- as.tibble(prep_coffee_brand[sampleCoffee, ])
+mediateToaster <- as.tibble(prep_toaster_brand[sampleToaster, ])
 
 # INDIVIDUAL STOPWORD LIST
-stopword_list <- c("a",	"about",	"after",	"again",	"against",	"all",	"am",	"an",	"and",	"any",	"are",	"aren't",	"as",	"at",	"be",	"because",	"been",	"before",	"being",	"between",	"both",	"by",	"can't",	"cannot",	"could",	"couldn't",	"did",	"didn't",	"do",	"does",	"doesn't",	"doing",	"don't",	"down",	"during",	"each",	"for",	"from",	"further",	"had",	"hadn't",	"has",	"hasn't",	"have",	"haven't",	"having",	"he",	"he'd",	"he'll",	"he's",	"her",	"here",	"here's",	"hers",	"herself",	"him",	"himself",	"his",	"how",	"how's",	"i",	"i'd",	"i'll",	"i'm",	"i've",	"if",	"in",	"into",	"isn't",	"it's",	"its",	"itself",	"let's",	"me",	"more",	"most",	"mustn't",	"my",	"myself",	"nor",	"only",	"other",	"ought",	"our",	"ours",	"ourselves",	"out",	"over",	"own",	"same",	"shan't",	"she",	"she'd",	"she'll",	"she's",	"should",	"shouldn't",	"so",	"some",	"such",	"that",	"that's",	"the",	"their",	"theirs",	"them",	"themselves",	"then",	"there",	"there's",	"these",	"they",	"they'd",	"they'll",	"they're",	"they've",	"this",	"those",	"through",	"too",	"under",	"until",	"up",	"very",	"was",	"wasn't",	"we",	"we'd",	"we'll",	"we're",	"we've",	"were",	"weren't",	"what",	"what's",	"when",	"when's",	"where",	"where's",	"which",	"while",	"who",	"who's",	"whom",	"why",	"why's",	"with",	"won't",	"would",	"wouldn't",	"you",	"you'd",	"you'll",	"you're",	"you've",	"your",	"yours",	"yourself",	"yourselves")
+stopword_list <- c("a",	"about",	"after",	"again",	"against",	"all",	"am",	"an",	"and",	"any",	"are",	"aren't",	"as",	"at",	"be",	"because",	"been",	"before",	"being",	"between",	"both",	"by",	"can't",	"cannot",	"could",	"couldn't",	"did",	"didn't",	"do",	"does",	"doesn't",	"doing",	"don't",	"down",	"during",	"each",	"for",	"from",	"further",	"had",	"hadn't",	"has",	"hasn't",	"have",	"haven't",	"having",	"he",	"he'd",	"he'll",	"he's",	"her",	"here",	"here's",	"hers",	"herself",	"him",	"himself",	"his",	"how",	"how's",	"i",	"i'd",	"i'll",	"i'm",	"i've",	"if",	"in",	"into",	"it", "isn't",	"it's",	"its",	"itself",	"let's",	"me",	"more",	"most",	"mustn't",	"my",	"myself",	"nor",	"only",	"other",	"ought",	"our",	"ours",	"ourselves",	"out",	"over",	"own",	"same",	"shan't",	"she",	"she'd",	"she'll",	"she's",	"should",	"shouldn't",	"so",	"some",	"such",	"that",	"that's",	"the",	"their",	"theirs",	"them",	"themselves",	"then",	"there",	"there's",	"these",	"they",	"they'd",	"they'll",	"they're",	"they've",	"this",	"those",	"through", "to",	"too",	"under",	"until",	"up",	"very",	"was",	"wasn't",	"we",	"we'd",	"we'll",	"we're",	"we've",	"were",	"weren't",	"what",	"what's",	"when",	"when's",	"where",	"where's",	"which",	"while",	"who",	"who's",	"whom",	"why",	"why's",	"with",	"won't",	"would",	"wouldn't",	"you",	"you'd",	"you'll",	"you're",	"you've",	"your",	"yours",	"yourself",	"yourselves")
+stopword_list <- as.tibble(stopword_list)
 #stopword_list <- as_vector()
 
 # MEDIATE DATA
-removeXGsw <- function(input){
+removeXGsw <- function(input, stopword_list){
   input %>% 
     unnest_tokens(word, review) %>% # unnest the reviews to single words
     anti_join(stopword_list, by = c("word" = "value")) %>% # anti-join to predefined stopword list
@@ -43,28 +44,28 @@ removeXGsw <- function(input){
            review = map_chr(review, paste, collapse = " ")) # separate by a blank
 }
 # Apply Function
-mediateHeadphone <- removeXGsw(mediateHeadphone)
-mediateCellphone <- removeXGsw(mediateCellphone)
-mediateCoffee <- removeXGsw(mediateCoffee)
-mediateToaster <- removeXGsw(mediateToaster)
+mediateHeadphone <- removeXGsw(mediateHeadphone, stopword_list)
+mediateCellphone <- removeXGsw(mediateCellphone, stopword_list)
+mediateCoffee <- removeXGsw(mediateCoffee, stopword_list)
+mediateToaster <- removeXGsw(mediateToaster, stopword_list)
 
 # CREATE TRAIN DATA
 trainHeadphone <- mediateHeadphone[1:50000,] # training-data
 trainCellphone<- mediateCellphone[1:50000,] # training-data
 trainToaster <- mediateToaster[1:50000,] # training-data
-trainCoffee <- mediateCoffee[1:50000,] # training-data
+trainCoffee <- mediateCoffee[1:20000,] # training-data
 
 # CREATE TEST DATA
 testHeadphone <- mediateHeadphone[50001:62187,] # test-dataset
 testCellphone <- mediateCellphone[50001:62187,] # test-dataset
 testToaster <- mediateToaster[50001:62187,] # test-dataset
-testCoffee <- mediateCoffee[50001:62187,] # test-dataset
+testCoffee <- mediateCoffee[20001:25065,] # test-dataset
 
 # CREATE THIRD DATA CHUNK
-verifyHeadphone <- prep_headphone_brand[40001:50000]
-verifyCellphone <- prep_cellphone_brand[40001:50000]
-verifyToaster <- prep_toaster_brand[40001:50000]
-verifyCoffee <- prep_coffee_brand[40001:50000]
+verifyHeadphone <- prep_headphone_brand[40001:50000,]
+verifyCellphone <- prep_cellphone_brand[40001:50000,]
+verifyToaster <- prep_toaster_brand[40001:50000,]
+verifyCoffee <- prep_coffee_brand[12500:17500,]
 
 # CREATE VOCABULARY
 # Tokenize the movie reviews and create a vocabulary of tokens including document counts
@@ -108,7 +109,7 @@ trainScoreHeadphone <- trainHeadphone$scoreNN
 testScoreHeadphone <- testHeadphone$scoreNN
 
 trainScoreCellphone <- trainCellphone$scoreNN
-testScoreCellphone <- testCoffee$scoreNN
+testScoreCellphone <- testCellphone$scoreNN
   
 trainScoreCoffee <- trainCoffee$scoreNN
 testScoreCoffee <- testCoffee$scoreNN
@@ -117,7 +118,7 @@ trainScoreToaster <- trainToaster$scoreNN
 testScoreToaster <- testToaster$scoreNN
 
 # CREATE XGB MATRIX
-# Turn the DTM into an XGB matrix using the sentiment labels that are to be learned
+# Turn the DTM into an XGB matrix using the sentiment scores that are to be learned
 xgbMTrainHeadphone <- xgb.DMatrix(dtm_trainHeadphone, label = trainScoreHeadphone)
 xgbMTestHeadphone <- xgb.DMatrix(dtm_testHeadphone, label = testScoreHeadphone)
 
@@ -159,7 +160,7 @@ prediction <- predict(xgb_fit, dtm_test2)
 
 # Create Feature Importance Overview
 xgbImpVar <- function(input, cols){
-  importance_vars <- xgb.importance(model=xgb_fit, feature_names = colnames(train_matrix))
+  importance_vars <- xgb.importance(model=input, feature_names = colnames(cols))
   return(importance_vars)
 }
 # Apply xgbImpVar Function
@@ -169,13 +170,25 @@ importanceCoffee <- xgbImpVar(xgbCoffee, xgbMTrainCoffee)
 importanceToaster <- xgbImpVar(xgbToaster, xgbMTrainToaster)
 
 # CLEAN FORMAT
-importanceClean <- importance_vars[,`:=`(Cover=NULL, Frequency=NULL)]
-xgb.plot.importance(importance_matrix = importance_vars, top_n = 20)
+xgbImpVarClean <- function(input){
+  importance_clean <- input[,`:=`(Cover=NULL, Frequency=NULL)]
+  return(importance_clean)
+}
+# Apply xgbImpVarClean Function
+importanceHeadphone <- xgbImpVarClean(importanceHeadphone)
+importanceCellphone <- xgbImpVarClean(importanceCellphone)
+importanceCoffee <- xgbImpVarClean(importanceCoffee)
+importanceToaster <- xgbImpVarClean(importanceToaster)
+
+# PLOT IMPORTANCE
+xgbPlot <- function(input, var){
+  xgb.ggplot.importance(importance_matrix = input, top_n = 20) +
+  ggtitle(paste("Variable Importance for the XGBOOST model of", var, sep=" "))
+}
+xgbPlot(importanceCoffee, "Coffee")
 
 # PRINT MOST IMPORTANT FEATURES
 head(importanceHeadphone, 100)
 head(importanceCellphone, 100)
 head(importanceCoffee, 100)
 head(importanceToaster, 100)
-
-

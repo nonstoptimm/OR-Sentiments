@@ -140,5 +140,33 @@ score_headphone <- fread("input-data/score_headphone.csv", showProgress = TRUE)
 # sentiContributionsBrand(tokenized_toaster, "")
 # sentiContributionsBrand(tokenized_coffee, "")
 
+# # RELATIVE IMPORTANCE MOST IMPORTANT TOPICS
+# topic1ToTopic2 <- function(topicProbabilities, dtm_input, k) {
+#   output <- lapply(1:nrow(dtm_input),function(x) sort(lda_input[x,])[k]/sort(lda_input[x,])[k-1]) 
+#   return(output)
+# }
+# 
+# # RELATIVE IMPORTANCE OF SECOND AND THIRD MOST IMPORTANT TOPICS
+# topic2ToTopic3 <- function(topicProbabilities, dtm_input, k) {
+#   output <- lapply(1:nrow(dtm_input),function(x) sort(topicProbabilities[x,])[k-1]/sort(topicProbabilities[x,])[k-2])
+#   return(output)
+# }
+
+# # CREATE ID FOR TOPIC MODEL TO MERGE THE TOPIC MODEL IT LATER
+# createID <- function(input){
+#   document <- paste(input$asin, input$reviewerID, sep = "-") 
+#   return(document)
+# }
+# # Apply Function
+# dtm_toaster_brand$document <- createID(dtm_toaster_brand)
+# dtm_cellphone_brand$document <- createID(dtm_cellphone_brand)
+# dtm_coffee_brand$document <- createID(dtm_coffee_brand)
+# dtm_headphone_brand$document <- createID(dtm_headphone_brand)
+
+# PRÜFEN WAS DAS IST?
+# dtmCreatorNN <- function(input) {
+#   input %>%
+#     cast_dtm(document, scoreNN, word, n)
+# }
 
 

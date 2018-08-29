@@ -11,12 +11,12 @@ getSentiment <- function(input, lexicon) {
     ungroup()
 }
 # Apply function to tokenized data set
-# Bing
+# Bing-Lexicon
 getSentiment(tokenized_coffee, "bing")
 getSentiment(tokenized_toaster, "bing")
 getSentiment(tokenized_headphone, "bing")
 getSentiment(tokenized_cellphone, "bing")
-# nrc
+# nrc-Lexicon
 getSentiment(tokenized_coffee, "nrc")
 getSentiment(tokenized_toaster, "nrc")
 getSentiment(tokenized_headphone, "nrc")
@@ -32,7 +32,7 @@ sentimentReview <- function(input) {
               words = n()) %>%
     ungroup()
 }
-# Apply sentimentReview FunctionBre
+# Apply sentimentReview Function
 sentimentReviewCellphone <- sentimentReview(tokenized_cellphone)
 sentimentReviewHeadphone <- sentimentReview(tokenized_headphone)
 sentimentReviewToaster <- sentimentReview(tokenized_toaster)
@@ -48,7 +48,7 @@ sentimentScoreAFINN <- function(input) {
     summarize(scoreAFINN = sum(score * n) / sum(n), numWords = n()) %>%
     arrange(desc(scoreAFINN))
 }
-# Apply it to dataset
+# Apply sentimentScoreAFINN Function
 scoreCellphoneAFINN <- sentimentScoreAFINN(wf_cellphone_brand)
 scoreHeadphoneAFINN <- sentimentScoreAFINN(wf_headphone_brand)
 scoreToasterAFINN <- sentimentScoreAFINN(wf_toaster_brand)

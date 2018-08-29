@@ -1,16 +1,17 @@
+# DATA CATEGORIZER
 # categorizeData.R
 # Load required packages
 library(dplyr)
+library(textcat)
 
-### CATEGORIZER
-# Function to join data
+# JOIN REVIEW AND META DATA
 joinData <- function(reviews, metadata) {
   merged <- inner_join(reviews, metadata, by = "asin")
   merged <- as_tibble(merged)
   return(merged)
 }
 
-## PHONES
+# CELLPHONES
 # Filter based on sub-categories
 categorizeMetaPhone <- function(input) {
   data <- input %>%
@@ -24,7 +25,7 @@ meta_cellphone <- categorizeMetaPhone(meta_cellphone)
 # Apply inner_join
 merged_cellphone <- joinData(raw_cellphone, meta_cellphone)
 
-## HEADPHONES
+# HEADPHONES
 categorizeMetaHeadphones <- function(input) {
   data <- input %>%
     filter(categories.0.0 == "Electronics" & categories.0.1 == "Accessories & Supplies" & categories.0.2 == "Audio & Video Accessories" & categories.0.3 == "Headphones")
@@ -37,7 +38,7 @@ meta_headphone <- categorizeMetaHeadphones(meta_electronics)
 # Apply inner_join
 merged_headphone <- joinData(raw_headphone, meta_headphone)
 
-## COFFEE MACHINE
+# COFFEE MACHINE
 categorizeMetaCoffee <- function(input) {
   input %>%
     filter(categories.0.0 == "Home & Kitchen" & categories.0.1 == "Kitchen & Dining" & categories.0.2 == "Coffee, Tea & Espresso" & categories.0.3 == "Coffee Makers")
@@ -50,7 +51,7 @@ meta_coffee <- categorizeMetaCoffee(meta_homekitchen)
 # Apply inner_join
 merged_coffee <- joinData(raw_homekitchen, meta_coffee)
 
-## TOASTERS
+# TOASTER
 categorizeMetaToaster <- function(input) {
   input %>%
     filter(categories.0.0 == "Home & Kitchen" & categories.0.1 == "Kitchen & Dining" & categories.0.2 == "Small Appliances" & categories.0.3 == "Ovens & Toasters" & categories.0.4 == "Toasters")
@@ -87,7 +88,7 @@ merged_headphone <- deleteNotEnglish(merged_headphone)
 merged_coffee <- deleteNotEnglish(merged_coffee)
 merged_toaster <- deleteNotEnglish(merged_toaster)
 
-## Branded Reviews Only
+# REMOVE ALL NON-BRANDED REVIEWS
 categorizeOnlyBranded <- function(input){
   input %>%
     filter(!brand == "")
@@ -110,7 +111,7 @@ merged_toaster_brand$document <- createID(merged_toaster_brand)
 merged_coffee_brand$document <- createID(merged_coffee_brand)
 merged_headphone_brand$document <- createID(merged_headphone_brand)
 
-## Add Sentiment Score to Branded Products
+# ADD NN-SENTIMENTSCORE TO BRANDED PRODUCTS
 # They have only been calculated for branded products!
 merged_cellphone_brand$scoreNN <- addSentiScore(score_cellphone)
 merged_toaster_brand$scoreNN <- addSentiScore(score_toaster)

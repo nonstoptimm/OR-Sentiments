@@ -17,7 +17,10 @@ meta_homekitchen <- ndjson::stream_in("/Volumes/OMEGA/Dataset/rawdata/raw_homeki
 contraction_list <- read.csv("input-data/contractions.csv", header = TRUE, sep = ";")
 
 # IMPORT INDIVIDUAL STOPWORDS
-# stopword_list <- read.csv("input-data/stopwords.csv", header = TRUE, sep = ";")
+stopword_list <- read.csv("input-data/stopwords.csv", header = TRUE, sep = ";")
+stopword_list <- unlist(stopword_list$word)
+stopword_list <- as.character(stopword_list)
+stopword_list <- as_tibble(stopword_list)
 
 # IMPORT THE SENTIMENT SCORES FROM DEEP LEARNING MODEL
 # Calculated Separately on Azure
@@ -31,7 +34,7 @@ prep_cellphone_brand <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Pr
 prep_coffee_brand <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_coffee_brand-clean.csv"))
 prep_toaster_brand  <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_toaster_brand-clean.csv"))
 prep_headphone_brand  <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/Prepared_Input_Data/prep_headphone_brand-clean.csv"))
-prep_cellphone_brand <- as_tibble(fread("output//prep_cellphone_brand-clean.csv"))
+prep_cellphone_brand <- as_tibble(fread("output/prep_cellphone_brand-clean.csv"))
 prep_coffee_brand <- as_tibble(fread("output/prep_coffee_brand-clean.csv"))
 prep_toaster_brand  <- as_tibble(fread("output/prep_toaster_brand-clean.csv"))
 prep_headphone_brand  <- as_tibble(fread("output/prep_headphone_brand-clean.csv"))
@@ -44,9 +47,16 @@ LDA_reviews_toaster <- readRDS("output/LDA_reviews_toaster.rds")
 LDA_reviews_headphone <- readRDS("output/LDA_reviews_headphone.rds")
 
 # IMPORT THE XGBOOST MODELS DATA
-xgb_fit <- readRDS("output/xgb_fit_noStopwords.rds")
-xgb_fit <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/xgb_fit-noProgress.rds")
-xgb_fit <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/xgb_fit-noProgress.rds")
+xgbHeadphone <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Headphone.rds")
+xgbHeadphone <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Headphone_noProgress.rds")
+xgbHeadphone <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Headphone_noStopwords.rds")
+xgbCellphone <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Cellphone.rds")
+xgbToaster <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Toaster.rds")
+xgbCoffee <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Coffee.rds")
+xgbHeadphone <- xgb.load("output/XG_Headphone")
+xgbCellphone <- xgb.load("output/XG_Cellphone")
+xgbCoffee <- xgb.load("output/XG_Coffee")
+xgbToaster <- xgb.load("output/XG_Toaster")
 
 # CLEANUP - this command was sometimes really necessary as we're dealing with a huge amount of data
 rm(list=ls())

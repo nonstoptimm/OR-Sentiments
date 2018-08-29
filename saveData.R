@@ -18,16 +18,17 @@ saveData(importance_vars2, "importance_vars2-noProgress")
 
 # SAVE TOPIC MODELS
 # Function to write topic models on the disk
-saveLDA <- function(input, filename) {
+saveRAW <- function(input, filename) {
   saveRDS(input, paste("output/", filename, ".rds", sep=""))
 }
 # Apply saveLDA Function
-saveLDA(LDA_reviews_cellphone, "LDA_reviews_cellphone")
-saveLDA(LDA_reviews_apple, "LDA_reviews_apple")
-saveLDA(LDA_reviews_samsung, "LDA_reviews_samsung")
-saveLDA(LDA_reviews_coffee, "LDA_reviews_coffee")
-saveLDA(LDA_reviews_toaster, "LDA_reviews_toaster")
-saveLDA(LDA_reviews_headphone, "LDA_reviews_headphone")
+saveRAW(LDA_reviews_cellphone, "LDA_reviews_cellphone")
+saveRAW(LDA_reviews_apple, "LDA_reviews_apple")
+saveRAW(LDA_reviews_samsung, "LDA_reviews_samsung")
+saveRAW(LDA_reviews_coffee, "LDA_reviews_coffee")
+saveRAW(LDA_reviews_toaster, "LDA_reviews_toaster")
+saveRAW(LDA_reviews_headphone, "LDA_reviews_headphone")
+saveRAW(xgbCoffee, "XG_Coffee")
 
 # SAVE XGBOOST
 saveXG <- function(input, filename){
@@ -38,4 +39,3 @@ saveXG(xgbHeadphones, "XG_Headphones")
 saveXG(xgbCellphones, "XG_Cellphones")
 saveXG(xgbCoffee, "XG_Coffee")
 saveXG(xgbToaster, "XG_Toaster")
-

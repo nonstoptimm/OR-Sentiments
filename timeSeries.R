@@ -4,8 +4,7 @@
 library(dplyr)
 library(lubridate)
 
-prep_coffee_brand %>% group_by(month=floor_date(reviewTime, "month")) %>% summarize(mean=mean(scoreNN))
-
+# CREATE TIME SERIES FOR SENTIMENT SCORE AND OVERALL RATING
 createTimeSeries <- function(input, brandSelect){
   input$reviewTime <- as.Date(input$reviewTime)
   # Get Months
@@ -18,7 +17,10 @@ createTimeSeries <- function(input, brandSelect){
   } else {
     aggregated <- input %>% group_by(brand, reviewYear, reviewMonth) %>% summarise(AvgScore=mean(scoreNN), AvgStar=mean(overall))
   }
-  # Return Aggregate
+  # Glue date back together and remove year+month
+  aggregated$date <- paste(aggregated$reviewYear, aggregated$reviewMonth, sep="-")
+  aggregated$reviewYear <- aggregated$reviewMonth <- NULL
+  # Return aggregated data
   return(aggregated)
 }
 # Apply createTimeSeries Function
@@ -27,8 +29,8 @@ timeHeadphoneBrand <- createTimeSeries(prep_headphone_brand, "y")
 timeHeadphoneBrandBeats <- timeHeadphoneBrand %>% filter(brand == "beats")
 timeHeadphoneBrandSennheiser <- timeHeadphoneBrand %>% filter(brand == "sennheiser")
 
-# AVERAGE TOPIC DISTRIBUTION
-createTopicSeries <- functionfunction(input, brandSelect){
+# CREATE TIME SERIES FOR AVERAGE TOPIC DISTRIBUTION
+createTopicSeries <- function(input, brandSelect){
   input$reviewTime <- as.Date(input$reviewTime)
   # Get Months
   input$reviewMonth <- format(as.Date(input$reviewTime), "%m")
@@ -40,6 +42,9 @@ createTopicSeries <- functionfunction(input, brandSelect){
   } else {
     aggregated <- input %>% group_by(brand, reviewYear, reviewMonth) %>% summarise(T1=mean(T1), T2=mean(T2), T3=mean(T3), T4=mean(T4), T5=mean(T5))
   }
-  # Return Aggregate
+  # Glue date back together and remove year+month
+  aggregated$date <- paste(aggregated$reviewYear, aggregated$reviewMonth, sep="-")
+  aggregated$reviewYear <- aggregated$reviewMonth <- NULL
+  # Return aggregated data
   return(aggregated)
 }

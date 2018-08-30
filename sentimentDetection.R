@@ -92,3 +92,12 @@ sentiContributionPlot(sentiContributionsBrand(tokenized_cellphone, "samsung"), "
 sentiContributionPlot(sentiContributionsBrand(tokenized_cellphone, "apple"), "Cellphones for the brand Apple")
 sentiContributionPlot(sentiContributions(tokenized_coffee), "Coffee")
 sentiContributionPlot(sentiContributions(tokenized_toaster), "Toaster")
+
+# CREATE BOXPLOT FOR OVERALL VS. SCORE
+boxplotScore <- function(input){
+  ggplot(prep_headphone_brand, aes(x=overall, y=scoreNN)) + 
+    geom_boxplot() 
+}
+# Apply boxplotScore Function
+
+

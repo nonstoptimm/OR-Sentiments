@@ -12,8 +12,10 @@ prepColumns <- function(input) {
   input$reviewTime <- as.Date(input$reviewTime, format = '%m %d, %Y')
   # Define overall as integer
   input$overall <- as.integer(input$overall)
-  # Substitute "&amp;" in Brand Names
+  # Substitute "&amp;" in Product Title
   input$title <- gsub("\\&amp;", " ", input$title)
+  # Substitute "&amp;" in Brand Names
+  input$brand <- gsub("\\&amp;", " ", input$brand)
   # Create ID for each document, combining asin and reviewerID
   input$document <- paste(input$asin, input$reviewerID, sep = "-") 
   return(input)

@@ -7,7 +7,6 @@ library(purrr)
 library(tidyverse)
 library(tidytext)
 library(tm) 
-library(broom)
 
 # CREATE A BRAND LIST TO USE IT FOR ANTI-JOIN
 brandList <- function(input){
@@ -26,21 +25,7 @@ brandListHeadphone <- brandList(prep_headphone_brand)
 brandListCoffee <- brandList(prep_coffee_brand)
 brandListToaster <- brandList(prep_toaster_brand)
 
-# ANTI JOIN BRAND NAMES
-dtm_headphone_byReview %>%
-  
-# FILTER FOR SPECIAL BRAND
-# For brand-specific topic-models
-dtm_filterBrand <- function(input, selectBrand) {
-  input %>%
-    filter(brand == selectBrand)
-}
-# Apply dtm_filterBrand Function
-dtm_cellphone_apple <- dtm_filterBrand(dtm_cellphone_brand, "apple")
-dtm_cellphone_samsung <- dtm_filterBrand(dtm_cellphone_brand, "samsung")
-dtm_headphone_beats <- dtm_filterBrand(dtm_headphone_brand, "beats")
-
-# SPLIT INTO WORDS
+# TOKENIZE DATA
 # Create tokenized dataset
 dtm_wordByReview <- function(input) {
   input$review <- gsub("[0-9]+", "", input$review) # Remove numbers
@@ -50,33 +35,15 @@ dtm_wordByReview <- function(input) {
 # Apply dtm_wordByReview Function
 dtm_headphone_byReview <- dtm_wordByReview(prep_headphone_brand)
 dtm_cellphone_byReview <- dtm_wordByReview(prep_cellphone_brand)
-dtm_coffee_byReview <- dtm_wordByReview(dtm_coffee_brand)
-dtm_toaster_byReview <- dtm_wordByReview(dtm_toaster_brand)
-# Brand-oriented
-dtm_apple_byReview <- dtm_wordByReview(dtm_cellphone_apple)
-dtm_samsung_byReview <- dtm_wordByReview(dtm_cellphone_samsung)
-
-# EXTRACT DOCUMENT ID OF REVIEWS
-# Some reviews do not exist any more after stopword removing
-# The document ID of the remaining reviews is extracted here to perform a join later on
-dtm_docDetect <- function(input, brandList) {
-  input %>%
-    anti_join(stop_words) %>%
-    anti_join(brandList) %>%
-    select(document) %>%
-    distinct()
-}
-# Apply dtm_docDetect Function
-dtm_detect_headphone <- dtm_docDetect(dtm_headphone_byReview, brandListHeadphone)
-dtm_detect_apple <- dtm_docDetect(dtm_apple_byReview)
-dtm_detect_cellphone <- dtm_docDetect(dtm_cellphone_byReview, brandListCellphone)
-dtm_detect_coffee <- dtm_docDetect(dtm_coffee_byReview)
+dtm_coffee_byReview <- dtm_wordByReview(prep_coffee_brand)
+dtm_toaster_byReview <- dtm_wordByReview(prep_toaster_brand)
 
 # JOIN FILTERED DATA
 dtm_join <- function(input, filtered) {
   input %>%
     inner_join(filtered)
 }
+dtm_detect_headphone <- tidied_headphone %>% group_by(document) %>% select(document) %>% distinct() %>% arrange(document)
 # Apply dtm_join Function
 merged_topic_headphone <- dtm_join(prep_headphone_brand, dtm_detect_headphone)
 merged_topic_cellphone <- dtm_join(prep_cellphone_brand, dtm_docDetect(dtm_cellphone_byReview, brandListCellphone))
@@ -97,18 +64,14 @@ dtm_wordCounts <- function(input, brandList) {
 # Apply dtm_wordCounts Function
 dtm_headphone_wordCounts <- dtm_wordCounts(dtm_headphone_byReview, brandListHeadphone)
 dtm_cellphone_wordCounts <- dtm_wordCounts(dtm_cellphone_byReview, brandListCellphone)
-dtm_toaster_wordCounts <- dtm_wordCounts(dtm_toaster_byReview)
-dtm_coffee_wordCounts <- dtm_wordCounts(dtm_coffee_byReview)
-# Brand-based
-dtm_apple_wordCounts <- dtm_wordCounts(dtm_apple_byReview)
-dtm_samsung_wordCounts <- dtm_wordCounts(dtm_samsung_byReview)
+dtm_toaster_wordCounts <- dtm_wordCounts(dtm_toaster_byReview, brandListToaster)
+dtm_coffee_wordCounts <- dtm_wordCounts(dtm_coffee_byReview, brandListCoffee)
 
-# CREATE DOCUMENT TERM MATRIX
+# CREATE DOCUMENT-TERM-MATRIX
 dtmCreator <- function(input) {
   input %>%
     cast_dtm(document, word, n)
 }
-
 # Apply dtmCreator Function
 dtm_cellphone <- dtmCreator(as_tibble(dtm_cellphone_wordCounts))
 dtm_cellphoneNN <- dtmCreatorNN(dtm_cellphone_wordCounts)
@@ -119,51 +82,84 @@ dtm_coffee <- dtmCreator(dtm_coffee_wordCounts)
 dtm_headphone <- dtmCreator(dtm_headphone_wordCounts)
 
 # REMOVE SPARSE TERMS
-dtm_headphone <- removeSparseTerms(dtm_headphone, 0.99) 
-dtm_cellphone <- removeSparseTerms(dtm_cellphone, 0.99)
-dtm_coffee <- removeSparseTerms(dtm_coffee, 0.99)
-dtm_toaster <- removeSparseTerms(dtm_toaster, 0.99) 
+# If desired/necessary
+dtm_headphone <- removeSparseTerms(dtm_headphone, 0.995) 
+dtm_cellphone <- removeSparseTerms(dtm_cellphone, 0.995)
+dtm_coffee <- removeSparseTerms(dtm_coffee, 0.995)
+dtm_toaster <- removeSparseTerms(dtm_toaster, 0.995) 
 
-# FUNCTION FOR MODEL TRAINING
+# TRAIN MODEL WITH GIBBS
 createLDA <- function(input, ntopic) {
-  # Find the sum of words in each Document to detect if there are empty ones
-  rowTotals <- apply(input , 1, sum) 
-  input <- input[rowTotals> 0, ]
-  # Set parameters for LDA
+  # Sum words in each review
+  rowSum <- apply(input, 1, sum)
+  # Delete all empty rows
+  input <- input[rowSum > 0, ]
+  # LDA Gibbs Parameter
   burnin <- 4000
   iter <- 2000
   thin <- 500
-  seed <-list(2003,5,63,100001,765)
+  seed <- list(2003,5,63,100001,765)
   nstart <- 5
   best <- TRUE
   # Number of topics
   k <- ntopic
   # Create LDA model using Gibbs sampling
-  ldaModel <- LDA(input,k, method="Gibbs", control=list(nstart=nstart, seed = seed, best=best, burnin = burnin, iter = iter, thin=thin))
-  return(ldaModel)
+  model <- LDA(input, k, method="Gibbs", control=list(nstart=nstart, seed = seed, best=best, burnin = burnin, iter = iter, thin=thin))
+  return(model)
 }
+# TRAIN MODEL WITH VMA
 createLDAsimple <- function(input, ntopics){
-  ldaModel <- LDA(input, k = ntopics, control = list(seed = 1234))
-  return(ldaModel)
+  model <- LDA(input, k = ntopics, control = list(seed = 1234))
+  return(model)
 }
 # Apply createLDA Function and train the model
 LDA_reviews_cellphone <- createLDA(dtm_cellphone, 5)
-LDA_reviews_apple <- createLDA(dtm_apple)
-LDA_reviews_samsung <- createLDA(dtm_samsung)
-LDA_reviews_toaster <- createLDA(dtm_toaster)
-LDA_reviews_coffee <- createLDA(dtm_coffee)
-LDA_reviews_headphone <- createLDA(dtm_headphone)
+LDA_reviews_toaster <- createLDA(dtm_toaster, 4)
+LDA_reviews_coffee <- createLDA(dtm_coffee, 4)
+LDA_reviews_headphone4 <- createLDA(dtm_headphoneSparse, 4)
+
+# Tidy it back, to fix the issue xxx
+tidied_headphone <- tidy(dtm_headphoneSparse)
+# Input must be (sparsed) dtm, which has been used for model training
+tidyDTM <- function(input){
+  tidied <- tidy(input)
+  
+}
+
+# # EXTRACT DOCUMENT ID OF REVIEWS
+# # Some reviews do not exist any more after stopword removing
+# # The document ID of the remaining reviews is extracted here to perform a join later on
+# dtm_docDetect <- function(input, brandList) {
+#   input %>%
+#     anti_join(stop_words) %>%
+#     anti_join(brandList) %>%
+#     select(document) %>%
+#     distinct()
+# }
+# # Apply dtm_docDetect Function
+# dtm_detect_headphone <- dtm_docDetect(dtm_headphone_byReview, brandListHeadphone)
+# dtm_detect_cellphone <- dtm_docDetect(dtm_cellphone_byReview, brandListCellphone)
+# dtm_detect_coffee <- dtm_docDetect(dtm_coffee_byReview, brandListCoffee)
+# dtm_detect_toaster <- dtm_docDetect(dtm_toaster_byReview, brandListToaster)
 
 # MAIN TOPIC OF EACH DOCUMENT
 # probabilities associated with each topic assignment
 mainTopic <- function(input){
-  matrix <- as.matrix(topics(input))
+  matrix <- as.data.frame(topics(input))
+  matrix$document <- rownames(matrix)
+  # Remove Rownames
+  rownames(matrix) <- c()
+  # Add Proper Name
+  names(matrix) <- c("mainTopic", "document")
+  # Reorder
+  matrix <- matrix[c("document", "mainTopic")]
   return(matrix)
 }
 # Apply mainTopic Function
 LDA_main_cellphone <- mainTopic(LDA_reviews_cellphone)
 LDA_main_cellphone <- mainTopic(LDA_reviews_cellphoneSimple)
 LDA_main_headphone <- mainTopic(LDA_reviews_headphone)
+LDA_main_headphone4 <- mainTopic(LDA_reviews_headphone4)
 LDA_main_coffee <- mainTopic(LDA_reviews_coffee)
 LDA_main_toaster <- mainTopic(LDA_reviews_toaster)
 
@@ -171,11 +167,9 @@ LDA_main_toaster <- mainTopic(LDA_reviews_toaster)
 LDA_prob_cellphone <- as.data.frame(LDA_reviews_cellphone@gamma)
 LDA_prob_cellphone <- as.data.frame(LDA_reviews_cellphoneSimple@gamma)
 LDA_prob_toaster <- as.data.frame(LDA_reviews_toaster@gamma)
-# LDA_prob_coffee <- as.data.frame(LDA_reviews_coffee@gamma)
-# LDA_prob_headphone <- as.data.frame(LDA_reviews_headphone@gamma)
-# # Brand-based
-# LDA_prob_cellphone-apple <- as.data.frame(LDA_reviews_apple@gamma)
-# LDA_prob_cellphone-samsung <- as.data.frame(LDA_reviews_samsung@gamma)
+LDA_prob_coffee <- as.data.frame(LDA_reviews_coffee@gamma)
+LDA_prob_headphone <- as.data.frame(LDA_reviews_headphone@gamma)
+LDA_prob_headphone4 <- as.data.frame(LDA_reviews_headphone4@gamma)
 
 # CREATE PROPER COLNAMES
 # Create "Topic" colnames depending on the amount of topics
@@ -189,6 +183,7 @@ LDA_prob_cellphone <- scoreCols(LDA_prob_cellphone, 4)
 LDA_prob_cellphone <- scoreCols(LDA_prob_cellphone, 5)
 LDA_prob_toaster <- scoreCols(LDA_prob_toaster, 5)
 LDA_prob_coffee <- scoreCols(LDA_prob_coffee, 5)
+LDA_prob_headphone4 <- scoreCols(LDA_prob_headphone4, 4)
 LDA_prob_headphone <- scoreCols(LDA_prob_headphone, 5)
 # Brand-based
 LDA_prob_cellphoneApple <- scoreCols(LDA_prob_CellphoneApple, 5)
@@ -204,6 +199,7 @@ LDA_cellphone_wtp <- as.matrix(terms(LDA_reviews_cellphone,8))
 LDA_toaster_wtp <- topicWTP(LDA_reviews_toaster)
 LDA_coffee_wtp <- topicWTP(LDA_reviews_coffee)
 LDA_headphone_wtp <- topicWTP(LDA_reviews_headphone)
+LDA_headphone_wtp <- topics(LDA_prob_headphone)
 # Brand-based
 LDA_apple_wtp <- topicWTP(LDA_reviews_apple)
 LDA_samsung_wtp <- topicWTP(LDA_reviews_samsung)
@@ -256,6 +252,14 @@ topicProbs_Headphone <- topicProbs(LDA_reviews_headphone)
 # Brand-based
 topicProbs_CellphoneApple <- topicProbs(LDA_reviews_apple)
 topicProbs_CellphoneSamsung <- topicProbs(LDA_reviews_samsung)
+
+# MERGE MAIN TOPIC AND PROBABILITIES DATAFRAME
+mergeTopics <- function(main, prob){
+  merged <- cbind(main, prob)
+  return(merged)
+}
+# Apply mergeTopics-function
+topics_headphone <- mergeTopics(LDA_main_headphone, LDA_prob_headphone)
 
 # ADD VALUES TO THE DATASET
 addTopicValues <- function(input, values) {
@@ -313,6 +317,13 @@ merged_topic_apple <- topicReviewScore(merged_topic_apple)
 merged_topic_toaster <- topicReviewScore(merged_topic_toaster)
 merged_topic_coffee <- topicReviewScore(merged_topic_coffee)
 
-# Create Boxplot for Overall Star Rating vs. Sentiment Score
-boxplot(Topic1 + Topic2 + Topic3 + Topic4 + Topic5~cyl,data=mtcars, main="Car Milage Data", 
-        xlab="Number of Cylinders", ylab="Miles Per Gallon")
+# # FILTER FOR SPECIAL BRAND
+# # For brand-specific topic-models
+# dtm_filterBrand <- function(input, selectBrand) {
+#  input %>%
+#    filter(brand == selectBrand)
+# }
+# # Apply dtm_filterBrand Function
+# dtm_cellphone_apple <- dtm_filterBrand(dtm_cellphone_brand, "apple")
+# dtm_cellphone_samsung <- dtm_filterBrand(dtm_cellphone_brand, "samsung")
+# dtm_headphone_beats <- dtm_filterBrand(dtm_headphone_brand, "beats")

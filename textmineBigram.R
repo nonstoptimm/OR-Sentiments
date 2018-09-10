@@ -63,7 +63,7 @@ tokenized_toaster_bigram_united <- uniteBigrams(tokenized_toaster_bigram_filtere
 # just apply countBigram again
 countBigramCellphone <- countBigram(tokenized_cellphone_bigram_united)
 countBigramHeadphone <- countBigram(tokenized_headphone_bigram_united)
-countBigramToaster <-countBigram(tokenized_toaster_bigram_united)
+countBigramToaster <- countBigram(tokenized_toaster_bigram_united)
 countBigramCoffee <- countBigram(tokenized_coffee_bigram_united)
 
 # ### FILTER BIGRAM FOR BATTERY LIFE E.G
@@ -90,6 +90,7 @@ filterBigramNotToaster <- filterBigramNot(tokenized_toaster_bigram)
 filterBigramNotHeadphone <- filterBigramNot(tokenized_headphone_bigram)
 
 ## SENTIMENT FOR NOT-WORDS
+# AUF SENTIMENT-ANALYSE BEZIEHEN
 sentimentNotWords <- function(input) {
   input %>%
   filter(w1 == "not") %>%
@@ -97,10 +98,10 @@ sentimentNotWords <- function(input) {
     count(w2, score, sort = TRUE) %>%
     ungroup()
 }
-# Apply sentimentNotWords Function
+# Apply sentimentNotWords-function
 sentimentNotWords(filterBigramNot(tokenized_headphone_bigram))
 
-### PLOT THE NEGATE-WORDS
+# PLOT THE NEGATE-WORDS
 tokenized_bigram_counts <- function(input, selectBrand) {
   if(selectBrand != "") {
     bigrams <- input %>% filter(brand == selectBrand)
@@ -110,8 +111,8 @@ tokenized_bigram_counts <- function(input, selectBrand) {
     bigrams <- input %>%
       unnest_tokens(bigram, review, token = "ngrams", n = 2)
   }
-  catcolumn <- as.data.frame(rep("i", nrow(bigrams)))
-  bigrams$cat <- catcolumn
+  category <- rep("i", nrow(bigrams))
+  bigrams$cat <- category
   bigrams %>%
   count(cat, bigram, sort = TRUE) %>%
   ungroup() %>%
@@ -125,6 +126,8 @@ tokenized_bigram_counts_toaster <- tokenized_bigram_counts(prep_toaster_brand, "
 
 # PLOT NEGATE WORDS
 plotNotWords <- function(input, text) {
+  category <- rep("c", nrow(input))
+  input$cat <- category
   input %>%
     filter(word1 %in% c("not")) %>%
     count(word1, word2, wt = n, sort = TRUE) %>%
@@ -138,8 +141,8 @@ plotNotWords <- function(input, text) {
     geom_col(show.legend = FALSE) +
     facet_wrap(~ word1, scales = "free", nrow = 3) +
     scale_x_discrete(labels = function(x) gsub("__.+$", "", x)) +
-    xlab("Words preceded by a negation") +
-    ylab("Sentiment score * # of occurrences") +
+    xlab("Negated word") +
+    ylab("Sentiment score * amount of hits") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     coord_flip() +
     ggtitle(paste("Negate-Words for", text, sep = " "))

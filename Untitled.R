@@ -125,20 +125,19 @@ score_headphone <- fread("input-data/score_headphone.csv", showProgress = TRUE)
 #countWordsDocumentCellphone <- countWordsDocument(tokenized_cellphone)
 
 # sentimentDetection
-# SENTIMENT CONTRIBUTION FOR BRANDED PRODUCTS
-# sentiContributionsBrand <- function(input, selectBrand) {
-#   input %>%
-#     filter(brand == selectBrand) %>%
-#     inner_join(get_sentiments("afinn"), by = "word") %>%
-#     group_by(word) %>%
-#     summarize(occurences = n(),
-#               contribution = sum(score))
-# }
+# SENTIMENT CONTRIBUTION
+sentiContributionsBrand <- function(input) {
+  input %>%
+    inner_join(get_sentiments("afinn"), by = "word") %>%
+    group_by(word) %>%
+    summarize(occurences = n(),
+              contribution = sum(score))
+}
 # Apply sentiContributionsBrand Function
-# sentiContributionsBrand(tokenized_headphone, "beats")
-# sentiContributionsBrand(tokenized_cellphone, "apple")
-# sentiContributionsBrand(tokenized_toaster, "")
-# sentiContributionsBrand(tokenized_coffee, "")
+sentiContributionsBrand(tokenized_headphone)
+sentiContributionsBrand(tokenized_cellphone)
+sentiContributionsBrand(tokenized_toaster)
+sentiContributionsBrand(tokenized_coffee)
 
 # # RELATIVE IMPORTANCE MOST IMPORTANT TOPICS
 # topic1ToTopic2 <- function(topicProbabilities, dtm_input, k) {

@@ -1,3 +1,4 @@
+# EXPLORATORY DATA ANALYSIS
 # exploreData.R
 library(dplyr)
 library(ggplot2)
@@ -21,6 +22,23 @@ countHit(meta_homekitchen)
 countHit(raw_electronics)
 countHit(raw_headphone)
 countHit(raw_homekitchen)
+
+# PLOT BARCHART
+plotBarchart <- function(input1, input2, input3, input4){
+  merged <- do.call("rbind", list(input1, input2, input3, input4))
+  merged <- merged %>% 
+    group_by(category, overall) %>% 
+    summarise(count=n()) %>% 
+    mutate(perc=count/sum(count))
+  ggplot(merged, aes(x = factor(category), y = perc*100, fill = factor(overall))) +
+    geom_bar(stat="identity", width = 0.7) +
+    labs(x = "Category", y = "Percent", fill = "Star Rating") +
+    scale_fill_brewer(palette="RdYlGn") +
+    ggtitle("Percentage distribution of Star Ratings") +
+    coord_flip()
+}
+# Apply plotBarchart-function
+plotBarchart(prep_coffee_brand, prep_toaster_brand, prep_cellphone_brand, prep_headphone_brand)
 
 # Plot Pretty Histograms
 plotHistogram <- function(input, title, xdesc, .) {
@@ -46,9 +64,26 @@ countBrands <- function(input){
 }
 # See What's In it
 top10brands_headphone <- countBrands(prep_headphone_brand)
-countBrands(prep_cellphone_brand)
-countBrands(prep_coffee_brand)
-countBrands(prep_toaster_brand)
+top10brands_cellphone <- countBrands(prep_cellphone_brand)
+top10brands_coffee <- countBrands(prep_coffee_brand)
+top10brands_toaster <- countBrands(prep_toaster_brand)
+
+# DETECT PRICES 
+averagePrice <- function(input, top_brands){
+  input %>%
+    select(brand, title, price) %>%
+    filter(brand %in% top_brands$brand[1:10]) %>%
+    group_by(brand, title) %>%
+    distinct() %>% 
+    ungroup() %>%
+    group_by(brand) %>%
+    summarize(avgPrice = mean(na.omit(price))) # in case there are missing values
+}
+# Apply averagePrice-function
+averagePrice(prep_headphone_brand, top10brands_headphone)
+averagePrice(prep_cellphone_brand, top10brands_cellphone)
+averagePrice(prep_toaster_brand, top10brands_toaster)
+averagePrice(prep_coffee_brand, top10brands_coffee)
 
 # DETECT MOST POPULAR PRODUCTS
 countBrandsProduct <- function(input){

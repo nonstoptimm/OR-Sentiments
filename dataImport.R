@@ -39,8 +39,7 @@ prep_cellphone_brand <- as_tibble(fread("output/prep_cellphone_brand-clean.csv")
 prep_coffee_brand <- as_tibble(fread("output/prep_coffee_brand-clean.csv"))
 prep_toaster_brand  <- as_tibble(fread("output/prep_toaster_brand-clean.csv"))
 prep_headphone_brand  <- as_tibble(fread("output/prep_headphone_brand-clean.csv"))
-merged_topic_cellphone  <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/old/merged_topic_cellphone.csv"))
-
+#merged_topic_cellphone  <- as_tibble(fread("/Volumes/OMEGA/Dataset/prepared_data/old/merged_topic_cellphone.csv"))
 
 # IMPORT THE CREATED TOPIC MODELS
 LDA_reviews_cellphone <- readRDS("output/LDA_reviews_cellphone.rds")

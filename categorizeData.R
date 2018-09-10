@@ -18,6 +18,8 @@ categorizeMetaPhone <- function(input) {
     filter(categories.0.0 == "Cell Phones & Accessories" & categories.0.1 == "Cell Phones" & categories.0.2 == "Unlocked Cell Phones")
   # Remove all category columns
   data$categories.0.0 <- data$categories.0.1 <- data$categories.0.2 <- data$categories.0.3 <- data$categories.0.4 <- NULL
+  # Add "Cellphones"-Column
+  data$category <- rep("Cellphones", nrow(data))
   return(data)  
 }
 # Apply Categorizer
@@ -31,6 +33,8 @@ categorizeMetaHeadphones <- function(input) {
     filter(categories.0.0 == "Electronics" & categories.0.1 == "Accessories & Supplies" & categories.0.2 == "Audio & Video Accessories" & categories.0.3 == "Headphones")
   # Remove all category columns
   data$categories.0.0 <- data$categories.0.1 <- data$categories.0.2 <- data$categories.0.3 <- data$categories.0.4 <- NULL
+  # Add "Headphones"-Column
+  data$category <- rep("Headphones", nrow(data))
   return(data)
 }
 # Apply Categorizer
@@ -40,10 +44,12 @@ merged_headphone <- joinData(raw_headphone, meta_headphone)
 
 # COFFEE MACHINE
 categorizeMetaCoffee <- function(input) {
-  input %>%
+  data <- input %>%
     filter(categories.0.0 == "Home & Kitchen" & categories.0.1 == "Kitchen & Dining" & categories.0.2 == "Coffee, Tea & Espresso" & categories.0.3 == "Coffee Makers")
   # Remove all category columns
   data$categories.0.0 <- data$categories.0.1 <- data$categories.0.2 <- data$categories.0.3 <- data$categories.0.4 <- NULL
+  # Add "Coffee Makers"-Column
+  data$category <- rep("Coffee Makers", nrow(data))
   return(data)  
 }
 # Apply Categorizer
@@ -53,10 +59,12 @@ merged_coffee <- joinData(raw_homekitchen, meta_coffee)
 
 # TOASTER
 categorizeMetaToaster <- function(input) {
-  input %>%
+  data <- input %>%
     filter(categories.0.0 == "Home & Kitchen" & categories.0.1 == "Kitchen & Dining" & categories.0.2 == "Small Appliances" & categories.0.3 == "Ovens & Toasters" & categories.0.4 == "Toasters")
   # Remove all category columns
   data$categories.0.0 <- data$categories.0.1 <- data$categories.0.2 <- data$categories.0.3 <- data$categories.0.4 <- NULL
+  # Add "Toaster"-Column
+  data$category <- rep("Toasters", nrow(data))
   return(data)  
 }
 # Apply Categorizer

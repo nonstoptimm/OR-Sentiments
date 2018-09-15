@@ -14,10 +14,10 @@ tokenizeReview <- function(input) {
     unnest_tokens(word, review)
 }
 # Apply it to datasets
-tokenized_headphone <- tokenizeReview(prep_headphone_brand)
-tokenized_cellphone <- tokenizeReview(prep_cellphone_brand)
-tokenized_coffee <- tokenizeReview(prep_coffee_brand)
-tokenized_toaster <- tokenizeReview(prep_toaster_brand)
+tokenized_headphone <- tokenizeReview(prep_headphone_brand) # Headphones
+tokenized_cellphone <- tokenizeReview(prep_cellphone_brand) # Cellphones
+tokenized_coffee <- tokenizeReview(prep_coffee_brand) # Coffee Makers 
+tokenized_toaster <- tokenizeReview(prep_toaster_brand) # Toaster
 
 # REMOVE STOPWORDS
 removeStopwords <- function(input){
@@ -25,10 +25,10 @@ removeStopwords <- function(input){
     anti_join(stop_words) # perform anti-join to stop_words
 } 
 # Apply to tokenized dataset
-tokenized_headphone <- removeStopwords(tokenized_headphone) # Headphones
-tokenized_cellphone <- removeStopwords(tokenized_cellphone) # Cellphones
-tokenized_coffee <- removeStopwords(tokenized_coffee) # Coffee Makers 
-tokenized_toaster <- removeStopwords(tokenized_toaster) # Toaster
+tokenized_headphone_filtered <- removeStopwords(tokenized_headphone) # Headphones
+tokenized_cellphone_filtered <- removeStopwords(tokenized_cellphone) # Cellphones
+tokenized_coffee_filtered <- removeStopwords(tokenized_coffee) # Coffee Makers 
+tokenized_toaster_filtered <- removeStopwords(tokenized_toaster) # Toaster
 
 # COUNT WORDS OVER WHOLE CORPUS WITHOUT SPECIAL UNWANTED WORDS
 # "Unwanted" words recommended, as e.g. category name itself would appear too often
@@ -38,10 +38,10 @@ countWords <- function(input, unwanted) {
     count(word, sort = TRUE) 
 }
 # Count Top Words excluding unwanted 
-wf_headphone <- countWords(tokenized_headphone, c("headphone", "buy", "product"))
-wf_cellphone <- countWords(tokenized_cellphone, c("phone", "buy", "product", "2", "3", "4", "34"))
-wf_toaster <- countWords(tokenized_toaster, c("toaster", "toast", "buy", "product", "2", "4"))
-wf_coffee <- countWords(tokenized_coffee, c("coffee", "buy", "machine", "maker", "1", "2", "3", "4", "5", "34"))
+wf_headphone <- countWords(tokenized_headphone_filtered, c("headphone", "buy", "product"))
+wf_cellphone <- countWords(tokenized_cellphone_filtered, c("phone", "buy", "product", "2", "3", "4", "34"))
+wf_toaster <- countWords(tokenized_toaster_filtered, c("toaster", "toast", "buy", "product", "2", "4"))
+wf_coffee <- countWords(tokenized_coffee_filtered, c("coffee", "buy", "machine", "maker", "1", "2", "3", "4", "5", "34"))
 
 # COUNT WORDS BASED ON BRAND
 countWordsBrand <- function(input, unwanted) {
@@ -52,10 +52,10 @@ countWordsBrand <- function(input, unwanted) {
     ungroup()
 }
 # Apply countWordsBrand-function
-wf_headphone_brand <- countWordsBrand(tokenized_headphone, c("headphone", "buy", "product"))
-wf_cellphone_brand <- countWordsBrand(tokenized_cellphone, c("phone", "buy", "product", "2"))
+wf_headphone_brand <- countWordsBrand(tokenized_headphone, c("headphone", "buy", "product"))  # Headphones
+wf_cellphone_brand <- countWordsBrand(tokenized_cellphone, c("phone", "buy", "product", "2")) # Cellphones
 wf_coffee_brand <- countWordsBrand(tokenized_coffee, c("coffee", "buy", "machine", "maker", "1", "2", "3", "4", "5", "34"))
-wf_toaster_brand <- countWordsBrand(tokenized_toaster, c("toaster", "toast", "buy", "product", "2", "4"))
+wf_toaster_brand <- countWordsBrand(tokenized_toaster, c("toaster", "toast", "buy", "product", "2", "4"))  # Toaster
 
 # CALCULATE TOTAL WORDS
 # Input must be wf for brands

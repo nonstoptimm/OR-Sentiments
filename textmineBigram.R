@@ -1,37 +1,39 @@
 # textBigram.R
+# TEXT MINING FOR BIGRAMS
 # Load required packages
 library(dplyr)
-library(tidyr)
+library(tidytext) # unnest_tokens
 library(ggplot2)
+library(tidyr) # spread/gather/separate
 
 # TOKENIZE THE INPUT DATA INTO BIGRAMS
-tokenizeBigram <- function(input) {
+tokenizeBigrams <- function(input) {
   input %>% 
-    unnest_tokens(bigram, review, token = "ngrams", n = 2) # bigram is n = 2
+    # n = 2 means bigram
+    unnest_tokens(bigram, review, token = "ngrams", n = 2) 
 }
-# Apply it to text data
-tokenized_headphone_bigram <- tokenizeBigram(prep_headphone_brand)
-tokenized_toaster_bigram <- tokenizeBigram(prep_toaster_brand)
-tokenized_cellphone_bigram <- tokenizeBigram(prep_cellphone_brand)
-tokenized_coffee_bigram <- tokenizeBigram(prep_coffee_brand)
+# Apply tokenizeBigrams-function
+tokenized_headphone_bigram <- tokenizeBigrams(prep_headphone_brand)
+tokenized_toaster_bigram <- tokenizeBigrams(prep_toaster_brand)
+tokenized_cellphone_bigram <- tokenizeBigrams(prep_cellphone_brand)
+tokenized_coffee_bigram <- tokenizeBigrams(prep_coffee_brand)
 
 # COUNTING WORDS (FUNCTION FOR WITH AND WITHOUT STOPWORDS)
 countBigram <- function(input) {
   input %>%
     count(bigram, sort = TRUE)
 }
-# Apply Bigram Counter
-countBigram(tokenized_cellphone_bigram)
-countBigram(tokenized_headphone_bigram)
-countBigram(tokenized_coffee_bigram)
-countBigram(tokenized_toaster_bigram)
+# Apply countBigram-function
+# No count on the unfiltered data, as it would not make sense (stopwords would appear)
+# Application later
 
 # SEPARATE BIGRAMS
+# to be able to filter out the stopwords
 separateBigrams <- function(input) {
   input %>%
     separate(bigram, c("w1", "w2"), sep = " ")
 }
-# Apply Bigram Separator
+# Apply separateBigrams-function
 tokenized_cellphone_bigram <- separateBigrams(tokenized_cellphone_bigram)
 tokenized_toaster_bigram <- separateBigrams(tokenized_toaster_bigram)
 tokenized_coffee_bigram <- separateBigrams(tokenized_coffee_bigram)
@@ -43,7 +45,7 @@ filterBigrams <- function(input) {
     filter(!w1 %in% stop_words$word) %>%
     filter(!w2 %in% stop_words$word)
 }
-# Apply Bigram Filter
+# Apply filterBigrams-function
 tokenized_headphone_bigram_filtered <- filterBigrams(tokenized_headphone_bigram)
 tokenized_cellphone_bigram_filtered <- filterBigrams(tokenized_cellphone_bigram)
 tokenized_coffee_bigram_filtered <- filterBigrams(tokenized_coffee_bigram)
@@ -53,57 +55,36 @@ tokenized_toaster_bigram_filtered <- filterBigrams(tokenized_toaster_bigram)
 uniteBigrams <- function(input) {
   input %>% unite(bigram, w1, w2, sep = " ")
 }
-# Apply Glue
+# Apply uniteBigrams-function
 tokenized_headphone_bigram_united <- uniteBigrams(tokenized_headphone_bigram_filtered)
 tokenized_cellphone_bigram_united <- uniteBigrams(tokenized_cellphone_bigram_filtered)
 tokenized_coffee_bigram_united <- uniteBigrams(tokenized_coffee_bigram_filtered)
 tokenized_toaster_bigram_united <- uniteBigrams(tokenized_toaster_bigram_filtered)
 
 # COUNTING WITHOUT STOPWORDS
-# just apply countBigram again
+# Apply countBigram-function again
 countBigramCellphone <- countBigram(tokenized_cellphone_bigram_united)
 countBigramHeadphone <- countBigram(tokenized_headphone_bigram_united)
 countBigramToaster <- countBigram(tokenized_toaster_bigram_united)
 countBigramCoffee <- countBigram(tokenized_coffee_bigram_united)
 
-# ### FILTER BIGRAM FOR BATTERY LIFE E.G
-# PRÜFEN: JUCKT NICHT WIRKLICH
-# filterBigramWord <- function(input, token1, token2) {
-#   input %>%
-#   filter(w1 == token1 & w2 == token2) %>%
-#     count(w1, w2, sort = TRUE)
-# }
-# # Apply manual Bigram Filter
-# filterBigramWord(tokenized_headphone_bigram, "poor", "performance")
-
 # FILTER FOR NEGATIONS
+# Unfiltered dataset has to be used (with stopwords)
 filterBigramNot <- function(input) {
   input %>%
   filter(w1 == "not") %>%
   filter(!w2 %in% stop_words$word) %>%
     count(w1, w2, sort = TRUE)
 }
-# Apply filter, unfiltered dataset has to be used (with stopwords)
+# Apply filterBigramNot-function
 filterBigramNotCellphone <- filterBigramNot(tokenized_cellphone_bigram)
 filterBigramNotCoffee <- filterBigramNot(tokenized_coffee_bigram)
 filterBigramNotToaster <- filterBigramNot(tokenized_toaster_bigram)
 filterBigramNotHeadphone <- filterBigramNot(tokenized_headphone_bigram)
 
-## SENTIMENT FOR NOT-WORDS
-# AUF SENTIMENT-ANALYSE BEZIEHEN
-sentimentNotWords <- function(input) {
-  input %>%
-  filter(w1 == "not") %>%
-    inner_join(get_sentiments("bing"), by = c(w2 = "word")) %>%
-    count(w2, score, sort = TRUE) %>%
-    ungroup()
-}
-# Apply sentimentNotWords-function
-sentimentNotWords(filterBigramNot(tokenized_headphone_bigram))
-
-# PLOT THE NEGATE-WORDS
-tokenized_bigram_counts <- function(input, selectBrand) {
-  if(selectBrand != "") {
+# PLOT NEGATED TERMS, PRECEDED BY A "NOT"
+plotNotWords <- function(input, text, selectBrand) {
+  if(selectBrand != "") { # if wanted, brand
     bigrams <- input %>% filter(brand == selectBrand)
     bigrams <- bigrams %>%
       unnest_tokens(bigram, review, token = "ngrams", n = 2)
@@ -111,24 +92,12 @@ tokenized_bigram_counts <- function(input, selectBrand) {
     bigrams <- input %>%
       unnest_tokens(bigram, review, token = "ngrams", n = 2)
   }
-  category <- rep("i", nrow(bigrams))
+  category <- rep("cat", nrow(bigrams))
   bigrams$cat <- category
   bigrams %>%
-  count(cat, bigram, sort = TRUE) %>%
-  ungroup() %>%
-  separate(bigram, c("word1", "word2"), sep = " ")
-}
-# Apply tokenized_bigram_counts
-tokenized_bigram_counts_cellphone <- tokenized_bigram_counts(prep_cellphone_brand, "")
-tokenized_bigram_counts_headphone <- tokenized_bigram_counts(prep_headphone_brand, "")
-tokenized_bigram_counts_coffee <- tokenized_bigram_counts(prep_coffee_brand, "")
-tokenized_bigram_counts_toaster <- tokenized_bigram_counts(prep_toaster_brand, "")
-
-# PLOT NEGATE WORDS
-plotNotWords <- function(input, text) {
-  category <- rep("c", nrow(input))
-  input$cat <- category
-  input %>%
+    count(cat, bigram, sort = TRUE) %>%
+    ungroup() %>%
+    separate(bigram, c("word1", "word2"), sep = " ") %>%
     filter(word1 %in% c("not")) %>%
     count(word1, word2, wt = n, sort = TRUE) %>%
     inner_join(get_sentiments("afinn"), by = c(word2 = "word")) %>%
@@ -138,20 +107,18 @@ plotNotWords <- function(input, text) {
     ungroup() %>%
     mutate(word2 = reorder(paste(word2, word1, sep = "__"), contribution)) %>%
     ggplot(aes(word2, contribution, fill = contribution > 0)) +
-    geom_col(show.legend = FALSE) +
-    facet_wrap(~ word1, scales = "free", nrow = 3) +
-    scale_x_discrete(labels = function(x) gsub("__.+$", "", x)) +
-    xlab("Negated word") +
-    ylab("Sentiment score * amount of hits") +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    coord_flip() +
-    ggtitle(paste("Negate-Words for", text, sep = " "))
+      geom_col(show.legend = FALSE) +
+      facet_wrap(~ word1, scales = "free", nrow = 3) +
+      scale_x_discrete(labels = function(x) gsub("__.+$", "", x)) +
+      xlab("Words preceded by a negation") +
+      ylab("Sentiment score * # of occurrences") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+      coord_flip() +
+      ggtitle(paste("Negate-Words for", text, sep = " ")) +
+      theme(text = element_text(size=16), plot.title = element_text(size = 14, face = "bold"))
 }
-# Apply it to the datasets
-plotNotWords(tokenized_bigram_counts(prep_headphone_brand, ""), "Headphones")
-plotNotWords(tokenized_bigram_counts(prep_headphone_brand, "beats"), "Headphones, Brand 'Beats'")
-plotNotWords(tokenized_bigram_counts(merged_topic_cellphone, ""), "Cellphones")
-plotNotWords(tokenized_bigram_counts(merged_topic_cellphone, "samsung"), "Cellphones, Brand 'Samsung'")
-plotNotWords(tokenized_bigram_counts(merged_topic_cellphone, "apple"), "Cellphones, Brand 'Apple'")
-plotNotWords(tokenized_bigram_counts(merged_topic_toaster, ""), "Toaster")  
-plotNotWords(tokenized_bigram_counts(merged_topic_coffee, ""), "Coffee")  
+# Apply plotNotWords-function
+plotNotWords(prep_headphone_brand, "Headphones", "")
+plotNotWords(prep_cellphone_brand, "Cellphones", "")
+plotNotWords(prep_toaster_brand, "Toasters")  
+plotNotWords(prep_coffee_brand, "Coffee")

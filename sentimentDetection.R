@@ -4,8 +4,20 @@ library(dplyr)
 library(tidytext)
 library(ggplot2)
 
+# CREATE UNIGRAM TOKENS
+# Unnest the reviews to one word per row
+tokenizeReview <- function(input) {
+  input %>%
+    unnest_tokens(word, review)
+}
+# Apply tokenizeReview-function
+tokenized_headphone <- tokenizeReview(prep_headphone_brand) # Headphones
+tokenized_cellphone <- tokenizeReview(prep_cellphone_brand) # Cellphones
+tokenized_coffee <- tokenizeReview(prep_coffee_brand) # Coffee Makers 
+tokenized_toaster <- tokenizeReview(prep_toaster_brand) # Toaster
+
 # GET SENTIMENT LABELS FOR BING OR NRC
-# Tokenized dataset as input and mention the lexicon
+# Tokenized dataset as input and mention the lexicon (only nrc and bing possible)
 # Does not play a crucuial role within this thesis, was just tested
 getSentiment <- function(input, lexicon) {
   input %>%
@@ -25,24 +37,23 @@ getSentiment(tokenized_toaster, "nrc")
 getSentiment(tokenized_headphone, "nrc")
 getSentiment(tokenized_cellphone, "nrc")
 
-# LEXICON-BASED SENTIMENT BY REVIEW
+# AFINN-SENTIMENT SCORE CALCULATION BY REVIEW  
 # Calculate Sentiment Score for every review
-sentimentReview <- function(input) {
+getSentimentAFINN <- function(input) {
   input %>%
     inner_join(get_sentiments("afinn"), by = "word") %>%
     group_by(document) %>%
-    summarize(sentiment = mean(score),
+    summarize(scoreLX = mean(score),
               words = n()) %>%
     ungroup()
 }
 # Apply sentimentReview-function
-sentimentReviewCellphone <- sentimentReview(tokenized_cellphone)
-sentimentReviewHeadphone <- sentimentReview(tokenized_headphone)
-sentimentReviewToaster <- sentimentReview(tokenized_toaster)
-sentimentReviewCoffee <- sentimentReview(tokenized_coffee)
+sentimentReviewHeadphone <- getSentimentAFINN(tokenized_headphone)
+sentimentReviewCellphone <- getSentimentAFINN(tokenized_cellphone)
+sentimentReviewToaster <- getSentimentAFINN(tokenized_toaster)
+sentimentReviewCoffee <- getSentimentAFINN(tokenized_coffee)
 
-# SENTIMENT SCORE CALCULATION FOR AFINN
-# Here, a separate function is necessary as we have to compute numerical values
+# AFINN-SENTIMENT SCORE CALCULATION BY BRAND
 # Word frequency as input
 sentimentScoreAFINN <- function(input) {
   input %>%
@@ -56,7 +67,7 @@ scoreHeadphoneAFINN <- sentimentScoreAFINN(wf_headphone_brand)
 scoreToasterAFINN <- sentimentScoreAFINN(wf_toaster_brand)
 scoreCoffeeAFINN <- sentimentScoreAFINN(wf_coffee_brand)
 
-# Plot Sentiment Score for AFINN based on Brands
+# PLOT SENTIMENT SCORE BASED ON BRAND
 plotSentimentScoreAFINN <- function(input, num, text) {
   input %>%
     filter(numWords > num) %>%
@@ -83,7 +94,7 @@ sentiContributions <- function(input) {
               contribution = sum(score))
 }
 # Apply sentiContributionsBrand Function
-sentiContributionsBrand(tokenized_headphone)
+sentiContributions(tokenized_headphone)
 sentiContributionsBrand(tokenized_cellphone)
 sentiContributionsBrand(tokenized_toaster)
 sentiContributionsBrand(tokenized_coffee)
@@ -91,12 +102,12 @@ sentiContributionsBrand(tokenized_coffee)
 # PLOT SENTIMENT CONTRIBUTION
 sentiContributionPlot <- function(input, selectCategory) {
   input %>%
-    top_n(25, abs(contribution)) %>%
+    top_n(20, abs(contribution)) %>%
     mutate(word = reorder(word, contribution)) %>%
     ggplot(aes(word, contribution, fill = contribution > 0)) +
     geom_col(show.legend = FALSE) +
     coord_flip() +
-    ggtitle(paste("Sentiment Contribution within", selectCategory, sep = " "))
+    ggtitle(paste("Sentiment Contribution within ", selectCategory, "-Category", sep = ""))
 }
 # Apply sentiContributionPlot Function
 sentiContributionPlot(sentiContributions(tokenized_headphone), "Headphones")
@@ -109,7 +120,9 @@ boxplotScore <- function(input, cat){
   input$overall <- as.factor(input$overall)
   ggplot(input, aes(x=overall, y=scoreNN)) + 
     geom_boxplot() +
-    ggtitle(paste("Sentiment-Score vs. Overall Rating for", cat, sep = " "))
+    theme(text = element_text(size=18), plot.title = element_text(size = 14, face = "bold")) +
+    ggtitle(paste("Sentiment-Score vs. Overall Rating for", cat, sep = " ")) +
+    ylim(-5,3)
 }
 # Apply boxplotScore Function
 boxplotScore(prep_headphone_brand, "Headphones")

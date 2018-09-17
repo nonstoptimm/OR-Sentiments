@@ -25,7 +25,7 @@ getSentiment <- function(input, lexicon) {
     count(word, sentiment, sort = TRUE) %>% # count sentiment hits
     ungroup()
 }
-# Apply function to tokenized data set
+# Apply getSentiment-function
 # Bing-Lexicon
 getSentiment(tokenized_coffee, "bing")
 getSentiment(tokenized_toaster, "bing")
@@ -48,42 +48,45 @@ getSentimentAFINN <- function(input) {
     ungroup()
 }
 # Apply sentimentReview-function
-sentimentReviewHeadphone <- getSentimentAFINN(tokenized_headphone)
-sentimentReviewCellphone <- getSentimentAFINN(tokenized_cellphone)
-sentimentReviewToaster <- getSentimentAFINN(tokenized_toaster)
-sentimentReviewCoffee <- getSentimentAFINN(tokenized_coffee)
+sentimentReviewHeadphone <- getSentimentAFINN(tokenized_headphone) # Headphones
+sentimentReviewCellphone <- getSentimentAFINN(tokenized_cellphone) # Cellphones
+sentimentReviewToaster <- getSentimentAFINN(tokenized_toaster) # Toaster
+sentimentReviewCoffee <- getSentimentAFINN(tokenized_coffee) # Coffee
 
 # AFINN-SENTIMENT SCORE CALCULATION BY BRAND
 # Word frequency as input
-sentimentScoreAFINN <- function(input) {
-  input %>%
+sentimentScoreAFINN <- function(input, brandList) {
+  input <- input %>%
+    filter(brand %in% brandList$brand) %>%
     inner_join(get_sentiments("afinn"), by = "word") %>%
     group_by(brand) %>%
-    summarize(scoreAFINN = sum(score * n) / sum(n), numWords = n())
+    summarize(scoreAFINN = sum(score * n) / sum(n))
+  input <- left_join(input, brandList, by = "brand")
 }
 # Apply sentimentScoreAFINN Function
-scoreCellphoneAFINN <- sentimentScoreAFINN(wf_cellphone_brand)
-scoreHeadphoneAFINN <- sentimentScoreAFINN(wf_headphone_brand)
-scoreToasterAFINN <- sentimentScoreAFINN(wf_toaster_brand)
-scoreCoffeeAFINN <- sentimentScoreAFINN(wf_coffee_brand)
+scoreCellphoneAFINN <- sentimentScoreAFINN(wf_cellphone_brand, top10brands_cellphone)
+scoreHeadphoneAFINN <- sentimentScoreAFINN(wf_headphone_brand, top10brands_headphone)
+scoreToasterAFINN <- sentimentScoreAFINN(wf_toaster_brand, top10brands_toaster)
+scoreCoffeeAFINN <- sentimentScoreAFINN(wf_coffee_brand, top10brands_coffee)
 
 # PLOT SENTIMENT SCORE BASED ON BRAND
-plotSentimentScoreAFINN <- function(input, num, text) {
+plotSentimentScoreAFINN <- function(input, text) {
   input %>%
-    filter(numWords > num) %>%
     mutate(brand = reorder(brand, scoreAFINN)) %>%
-    ggplot(aes(brand, scoreAFINN, fill = scoreAFINN > 0)) +
-    geom_col(show.legend = FALSE) +
-    coord_flip() +
-    xlab("Brand") +
-    ylab("Average sentiment score") +
-    ggtitle(paste("Average Sentiment Score for frequent brands in ", text, "-category", sep = ""))
+    ggplot(aes(brand, scoreAFINN, fill = priceGroup)) +
+      geom_col(colour="black") +
+      coord_flip() +
+      xlab("Brand") +
+      ylab("Average sentiment score") +
+      ggtitle(paste("Mean Score for Brands in ", text, "-Category", sep = "")) +
+      geom_label(aes(label = meanStar), color = "black", show.legend = FALSE, hjust = 1.2) +
+      scale_fill_brewer(name = "Price Segment")
 }
 # Apply plotSentimentScoreAFINN Function
-plotSentimentScoreAFINN(scoreCellphoneAFINN, 300, "Cellphones")
-plotSentimentScoreAFINN(scoreHeadphoneAFINN, 680, "Headphones")
-plotSentimentScoreAFINN(scoreToasterAFINN, 270, "Toaster")
-plotSentimentScoreAFINN(scoreCoffeeAFINN, 505, "Coffee")
+plotSentimentScoreAFINN(scoreCellphoneAFINN, "Cellphones")
+plotSentimentScoreAFINN(scoreHeadphoneAFINN, "Headphones")
+plotSentimentScoreAFINN(scoreToasterAFINN, "Toaster")
+plotSentimentScoreAFINN(scoreCoffeeAFINN, "Coffee")
 
 # SENTIMENT CONTRIBUTION
 sentiContributions <- function(input) {
@@ -94,15 +97,15 @@ sentiContributions <- function(input) {
               contribution = sum(score))
 }
 # Apply sentiContributionsBrand Function
-sentiContributions(tokenized_headphone)
-sentiContributionsBrand(tokenized_cellphone)
-sentiContributionsBrand(tokenized_toaster)
-sentiContributionsBrand(tokenized_coffee)
+contributionHeadphone <- sentiContributions(tokenized_headphone)
+contributionCellphone <- sentiContributions(tokenized_cellphone)
+contributionToaster <- sentiContributions(tokenized_toaster)
+contributionCoffee <- sentiContributions(tokenized_coffee)
 
 # PLOT SENTIMENT CONTRIBUTION
 sentiContributionPlot <- function(input, selectCategory) {
   input %>%
-    top_n(20, abs(contribution)) %>%
+    top_n(11, abs(contribution)) %>%
     mutate(word = reorder(word, contribution)) %>%
     ggplot(aes(word, contribution, fill = contribution > 0)) +
     geom_col(show.legend = FALSE) +
@@ -110,10 +113,10 @@ sentiContributionPlot <- function(input, selectCategory) {
     ggtitle(paste("Sentiment Contribution within ", selectCategory, "-Category", sep = ""))
 }
 # Apply sentiContributionPlot Function
-sentiContributionPlot(sentiContributions(tokenized_headphone), "Headphones")
-sentiContributionPlot(sentiContributions(tokenized_cellphone), "Cellphones")
-sentiContributionPlot(sentiContributions(tokenized_coffee), "Coffee")
-sentiContributionPlot(sentiContributions(tokenized_toaster), "Toaster")
+sentiContributionPlot(contributionHeadphone, "Headphones")
+sentiContributionPlot(contributionCellphone, "Cellphones")
+sentiContributionPlot(contributionToaster, "Toaster")
+sentiContributionPlot(contributionCoffee, "Coffee")
 
 # CREATE BOXPLOT FOR OVERALL VS. SCORE
 boxplotScore <- function(input, cat){

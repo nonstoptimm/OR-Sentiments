@@ -22,7 +22,7 @@ categorizeMetaPhone <- function(input) {
   data$category <- rep("Cellphones", nrow(data))
   return(data)  
 }
-# Apply Categorizer
+# Apply categorizeMetaToaster-function
 meta_cellphone <- categorizeMetaPhone(meta_cellphone)
 # Apply inner_join
 merged_cellphone <- joinData(raw_cellphone, meta_cellphone)
@@ -37,7 +37,7 @@ categorizeMetaHeadphones <- function(input) {
   data$category <- rep("Headphones", nrow(data))
   return(data)
 }
-# Apply Categorizer
+# Apply categorizeMetaToaster-function
 meta_headphone <- categorizeMetaHeadphones(meta_electronics)
 # Apply inner_join
 merged_headphone <- joinData(raw_headphone, meta_headphone)
@@ -52,7 +52,7 @@ categorizeMetaCoffee <- function(input) {
   data$category <- rep("Coffee Makers", nrow(data))
   return(data)  
 }
-# Apply Categorizer
+# Apply categorizeMetaToaster-function
 meta_coffee <- categorizeMetaCoffee(meta_homekitchen)
 # Apply inner_join
 merged_coffee <- joinData(raw_homekitchen, meta_coffee)
@@ -67,7 +67,7 @@ categorizeMetaToaster <- function(input) {
   data$category <- rep("Toasters", nrow(data))
   return(data)  
 }
-# Apply Categorizer
+# Apply categorizeMetaToaster-function
 meta_toaster <- categorizeMetaToaster(meta_homekitchen)
 # Apply inner_join
 merged_toaster <- joinData(raw_homekitchen, meta_toaster)
@@ -78,7 +78,7 @@ detectLanguage <- function(input) {
   reviewLanguage <- textcat(input, p = langProfile)
   return(reviewLanguage)
 }
-# Apply detectLanguage Function
+# Apply detectLanguage-function
 merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
 merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
 merged_coffee$reviewLanguage <- detectLanguage(merged_coffee$review)
@@ -90,7 +90,7 @@ deleteNotEnglish <- function(input) {
     filter(reviewLanguage == "english") %>% # filter for english reviews
     select(-reviewLanguage) # Remove the language column again, as it is no longer needed
 }
-# Apply deleteNotEnglish Function
+# Apply deleteNotEnglish-function
 merged_cellphone <- deleteNotEnglish(merged_cellphone)
 merged_headphone <- deleteNotEnglish(merged_headphone)
 merged_coffee <- deleteNotEnglish(merged_coffee)
@@ -101,7 +101,7 @@ categorizeOnlyBranded <- function(input){
   input %>%
     filter(!brand == "")
 }
-# Apply that only reviews with a brand remain
+# Apply categorizeOnlyBranded-function
 merged_cellphone_brand <- categorizeOnlyBranded(merged_cellphone)
 merged_headphone_brand <- categorizeOnlyBranded(merged_headphone)
 merged_coffee_brand <- categorizeOnlyBranded(merged_coffee)
@@ -113,7 +113,7 @@ createID <- function(input){
   document <- paste(input$asin, input$reviewerID, sep = "-") 
   return(document)
 }
-# Apply createID Function
+# Apply createID-function
 merged_cellphone_brand$document <- createID(merged_cellphone_brand)
 merged_toaster_brand$document <- createID(merged_toaster_brand)
 merged_coffee_brand$document <- createID(merged_coffee_brand)

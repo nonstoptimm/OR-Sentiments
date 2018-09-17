@@ -8,7 +8,7 @@ countHit <- function(input){
   # Count hitcount for every variable  
   sapply(input, function(x) length(unique(x)))
 }
-# APPLY FORMULA
+# Apply countHit-function
 # Prepared Datasets
 countHit(prep_headphone_brand)
 countHit(prep_cellphone_brand)
@@ -40,7 +40,7 @@ plotBarchart <- function(input1, input2, input3, input4){
 # Apply plotBarchart-function
 plotBarchart(prep_coffee_brand, prep_toaster_brand, prep_cellphone_brand, prep_headphone_brand)
 
-# Plot Pretty Histograms
+# PLOT HISTORGAM FOR OVERALL RATING
 plotHistogram <- function(input, title, xdesc, .) {
   ggplot(input, aes(.)) +
     geom_histogram(binwidth = 0.5) +
@@ -49,7 +49,7 @@ plotHistogram <- function(input, title, xdesc, .) {
     scale_color_manual(name = "Statistics", values = c(mean = "red")) +
     ggtitle(paste("Histogram of ", title, sep = ""))
 }
-# Apply Formula
+# Apply plotHistogram-function
 plotHistogram(prep_headphone_brand, "Overall Rating for Headphones", "Overall Rating", prep_headphone_brand$overall)
 plotHistogram(prep_cellphone_brand, "Overall Rating for Cellphones", "Overall Rating", prep_cellphone_brand$overall)
 plotHistogram(prep_coffee_brand, "Overall Rating for Coffee Makers", "Overall Rating", prep_coffee_brand$overall)
@@ -57,18 +57,19 @@ plotHistogram(prep_toaster_brand, "Overall Rating for Toaster", "Overall Rating"
 
 # DETECT MOST COMMON BRANDS
 countBrands <- function(input){
-  input %>%
+  input <- input %>%
     group_by(brand) %>% 
-      summarise(reviewCount = n()) %>% 
+      summarise(reviewCount = n(), meanStar = round(mean(overall),2)) %>% 
         arrange(desc(reviewCount))
+  return(input[1:10,])
 }
-# See What's In it
+# Apply countBrands-function
 top10brands_headphone <- countBrands(prep_headphone_brand)
 top10brands_cellphone <- countBrands(prep_cellphone_brand)
 top10brands_coffee <- countBrands(prep_coffee_brand)
 top10brands_toaster <- countBrands(prep_toaster_brand)
 
-# DETECT PRICES 
+# DETECT PRICES AND SET TRESHOLDS FOR SEGMENT GROUPS
 averagePrice <- function(input, top_brands){
   input %>%
     select(brand, title, price) %>%
@@ -80,10 +81,25 @@ averagePrice <- function(input, top_brands){
     summarize(avgPrice = mean(na.omit(price))) # in case there are missing values
 }
 # Apply averagePrice-function
-averagePrice(prep_headphone_brand, top10brands_headphone)
-averagePrice(prep_cellphone_brand, top10brands_cellphone)
-averagePrice(prep_toaster_brand, top10brands_toaster)
-averagePrice(prep_coffee_brand, top10brands_coffee)
+avgPriceHeadphone <- averagePrice(prep_headphone_brand, top10brands_headphone)
+avgPriceCellphone <- averagePrice(prep_cellphone_brand, top10brands_cellphone)
+avgPriceToaster <- averagePrice(prep_toaster_brand, top10brands_toaster)
+avgPriceCoffee <- averagePrice(prep_coffee_brand, top10brands_coffee)
+
+# SET PRICE GROUPS
+setPriceGroups <- function(brandList, brandPrices, tLow, tHigh) {
+  brandPrices$priceGroup <- sapply(brandPrices$avgPrice, function(x) ifelse(x < tLow, "Low", ifelse(x < tHigh, "Medium", "High")))
+  brandPrices$priceGroup <- as.factor(brandPrices$priceGroup)
+  brandPrices$priceGroup <- factor(brandPrices$priceGroup,levels(brandPrices$priceGroup)[c(2,3,1)])
+  brandList %>% 
+    arrange(brand) %>% 
+    left_join(brandPrices, by = "brand")
+}
+# Apply setPriceGroups-function
+top10brands_headphone <- setPriceGroups(top10brands_headphone, avgPriceHeadphone, 30, 100)
+top10brands_cellphone <- setPriceGroups(top10brands_cellphone, avgPriceCellphone, 100, 300)
+top10brands_coffee <- setPriceGroups(top10brands_coffee, avgPriceCoffee, 50, 100)
+top10brands_toaster <- setPriceGroups(top10brands_toaster, avgPriceToaster, 50, 100)
 
 # DETECT MOST POPULAR PRODUCTS
 countBrandsProduct <- function(input){
@@ -92,9 +108,8 @@ countBrandsProduct <- function(input){
     summarise(reviewCount = n()) %>% 
     arrange(desc(reviewCount))
 }
-# Apply Function
+# Apply countBrandsProduct-function
 countBrandsProduct(prep_headphone_brand)
 countBrandsProduct(prep_coffee_brand)
 countBrandsProduct(prep_toaster_brand)
 countBrandsProduct(prep_cellphone_brand)
-

@@ -1,5 +1,6 @@
 # LEXICON-BASED SENTIMENT ANALYSIS
 # sentimentDetection.R
+# Load required packages
 library(dplyr)
 library(tidytext)
 library(ggplot2)
@@ -63,14 +64,15 @@ sentimentScoreAFINN <- function(input, brandList) {
     summarize(scoreAFINN = sum(score * n) / sum(n))
   input <- left_join(input, brandList, by = "brand")
 }
-# Apply sentimentScoreAFINN Function
+# Apply sentimentScoreAFINN-function
 scoreCellphoneAFINN <- sentimentScoreAFINN(wf_cellphone_brand, top10brands_cellphone)
 scoreHeadphoneAFINN <- sentimentScoreAFINN(wf_headphone_brand, top10brands_headphone)
 scoreToasterAFINN <- sentimentScoreAFINN(wf_toaster_brand, top10brands_toaster)
 scoreCoffeeAFINN <- sentimentScoreAFINN(wf_coffee_brand, top10brands_coffee)
 
 # PLOT SENTIMENT SCORE BASED ON BRAND
-plotSentimentScoreAFINN <- function(input, text) {
+plotSentimentScoreAFINN <- function(input, names, text) {
+  input$brand <- names
   input %>%
     mutate(brand = reorder(brand, scoreAFINN)) %>%
     ggplot(aes(brand, scoreAFINN, fill = priceGroup)) +
@@ -79,14 +81,16 @@ plotSentimentScoreAFINN <- function(input, text) {
       xlab("Brand") +
       ylab("Average sentiment score") +
       ggtitle(paste("Mean Score for Brands in ", text, "-Category", sep = "")) +
+      geom_hline(aes(yintercept=mean(scoreAFINN), color="mean"), size=1) +
       geom_label(aes(label = meanStar), color = "black", show.legend = FALSE, hjust = 1.2) +
-      scale_fill_brewer(name = "Price Segment")
+      scale_fill_brewer(name = "Price Segment") +
+      scale_color_manual(name = "Statistics", values = c(mean = "red"))
 }
-# Apply plotSentimentScoreAFINN Function
-plotSentimentScoreAFINN(scoreCellphoneAFINN, "Cellphones")
-plotSentimentScoreAFINN(scoreHeadphoneAFINN, "Headphones")
-plotSentimentScoreAFINN(scoreToasterAFINN, "Toaster")
-plotSentimentScoreAFINN(scoreCoffeeAFINN, "Coffee")
+# Apply plotSentimentScoreAFINN-function
+plotSentimentScoreAFINN(scoreCellphoneAFINN, nameBrandCellphone , "Cellphones")
+plotSentimentScoreAFINN(scoreHeadphoneAFINN, nameBrandHeadphone,"Headphones")
+plotSentimentScoreAFINN(scoreToasterAFINN, nameBrandToaster, "Toaster")
+plotSentimentScoreAFINN(scoreCoffeeAFINN, nameBrandCoffee, "Coffee")
 
 # SENTIMENT CONTRIBUTION
 sentiContributions <- function(input) {
@@ -96,7 +100,7 @@ sentiContributions <- function(input) {
     summarize(occurences = n(),
               contribution = sum(score))
 }
-# Apply sentiContributionsBrand Function
+# Apply sentiContributionsBrand-function
 contributionHeadphone <- sentiContributions(tokenized_headphone)
 contributionCellphone <- sentiContributions(tokenized_cellphone)
 contributionToaster <- sentiContributions(tokenized_toaster)
@@ -112,23 +116,40 @@ sentiContributionPlot <- function(input, selectCategory) {
     coord_flip() +
     ggtitle(paste("Sentiment Contribution within ", selectCategory, "-Category", sep = ""))
 }
-# Apply sentiContributionPlot Function
+# Apply sentiContributionPlot-function
 sentiContributionPlot(contributionHeadphone, "Headphones")
 sentiContributionPlot(contributionCellphone, "Cellphones")
 sentiContributionPlot(contributionToaster, "Toaster")
 sentiContributionPlot(contributionCoffee, "Coffee")
 
-# CREATE BOXPLOT FOR OVERALL VS. SCORE
-boxplotScore <- function(input, cat){
+# CREATE BOXPLOT FOR OVERALL VS. SCORELX
+boxplotScoreLX <- function(input, cat){
+  input$overall <- as.factor(input$overall)
+  ggplot(input, aes(x=overall, y=scoreLX)) + 
+    geom_boxplot() +
+    theme(text = element_text(size=18), plot.title = element_text(size = 14, face = "bold")) +
+    ylim(-4,5) +
+    #geom_hline(aes(yintercept=mean(scoreLX), color="mean"), size=1) +
+    #scale_color_manual(name = "Statistics", values = c(mean = "red")) +
+    ggtitle(paste("Lexicon-Sentiment-Score vs. Overall Rating for", cat, sep = " "))
+}
+# Apply boxplotScore-function
+boxplotScoreLX(prep_headphone_brand, "Headphones")
+boxplotScoreLX(prep_cellphone_brand, "Cellphones")
+boxplotScoreLX(prep_toaster_brand, "Toasters")
+boxplotScoreLX(prep_coffee_brand, "Coffee Makers")
+
+# CREATE BOXPLOT FOR OVERALL VS. SCORENN
+boxplotScoreNN <- function(input, cat){
   input$overall <- as.factor(input$overall)
   ggplot(input, aes(x=overall, y=scoreNN)) + 
     geom_boxplot() +
     theme(text = element_text(size=18), plot.title = element_text(size = 14, face = "bold")) +
-    ggtitle(paste("Sentiment-Score vs. Overall Rating for", cat, sep = " ")) +
+    ggtitle(paste("ML-Sentiment-Score vs. Overall Rating for", cat, sep = " ")) +
     ylim(-5,3)
 }
-# Apply boxplotScore Function
-boxplotScore(prep_headphone_brand, "Headphones")
-boxplotScore(prep_cellphone_brand, "Cellphones")
-boxplotScore(prep_toaster_brand, "Toasters")
-boxplotScore(prep_coffee_brand, "Coffee Makers")
+# Apply boxplotScore-function
+boxplotScoreNN(prep_headphone_brand, "Headphones")
+boxplotScoreNN(prep_cellphone_brand, "Cellphones")
+boxplotScoreNN(prep_toaster_brand, "Toasters")
+boxplotScoreNN(prep_coffee_brand, "Coffee Makers")

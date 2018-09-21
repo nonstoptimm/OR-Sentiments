@@ -11,8 +11,8 @@ joinData <- function(reviews, metadata) {
   return(merged)
 }
 
+# FILTER BASED ON SUB-CATEGORIES
 # CELLPHONES
-# Filter based on sub-categories
 categorizeMetaPhone <- function(input) {
   data <- input %>%
     filter(categories.0.0 == "Cell Phones & Accessories" & categories.0.1 == "Cell Phones" & categories.0.2 == "Unlocked Cell Phones")
@@ -107,8 +107,7 @@ merged_headphone_brand <- categorizeOnlyBranded(merged_headphone)
 merged_coffee_brand <- categorizeOnlyBranded(merged_coffee)
 merged_toaster_brand <- categorizeOnlyBranded(merged_toaster)
 
-# CREATE DOCUMENT ID
-# To identify each document
+# CREATE DOCUMENT ID (UNIQUE DOCUMENT IDENTIFIER)
 createID <- function(input){
   document <- paste(input$asin, input$reviewerID, sep = "-") 
   return(document)

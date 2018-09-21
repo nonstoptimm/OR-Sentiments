@@ -1,5 +1,6 @@
 # EXPLORATORY DATA ANALYSIS
 # exploreData.R
+# Load required packages
 library(dplyr)
 library(ggplot2)
 

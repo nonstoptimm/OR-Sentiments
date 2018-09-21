@@ -1,5 +1,5 @@
-# saveData.R
 # OBJECT WRITER 
+# saveData.R
 # Load required packages
 library(data.table)
 library(xgboost)
@@ -9,7 +9,7 @@ library(xgboost)
 saveData <- function(input, filename){
   fwrite(input, paste("output/", filename, ".csv", sep=""))  
 }
-# Apply saveData Function
+# Apply saveData-function
 saveData(prep_headphone_brand, "prep_headphone_brand-clean")
 saveData(prep_cellphone_brand, "prep_cellphone_brand-clean")
 saveData(prep_toaster_brand, "prep_toaster_brand-clean")
@@ -21,7 +21,7 @@ saveData(importance_vars2, "importance_vars2-noProgress")
 saveRAW <- function(input, filename) {
   saveRDS(input, paste("output/", filename, ".rds", sep=""))
 }
-# Apply saveLDA Function
+# Apply saveLDA-function
 saveRAW(LDA_reviews_cellphone, "LDA_reviews_cellphone")
 saveRAW(LDA_reviews_apple, "LDA_reviews_apple")
 saveRAW(LDA_reviews_samsung, "LDA_reviews_samsung")
@@ -34,7 +34,7 @@ saveRAW(xgbCoffee, "XG_Coffee")
 saveXG <- function(input, filename){
   xgb.save(input, paste("output/", filename, sep=""))
 }
-# Apply saveXG Function
+# Apply saveXG-function
 saveXG(xgbHeadphones, "XG_Headphones")
 saveXG(xgbCellphones, "XG_Cellphones")
 saveXG(xgbCoffee, "XG_Coffee")

@@ -1,5 +1,5 @@
-# generateTopics.R
 # TOPIC MODELING
+# generateTopics.R
 # Load required packages
 library(dplyr)
 library(purrr)

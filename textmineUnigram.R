@@ -1,3 +1,4 @@
+# TEXT MINING OF UNIGRAMS
 # textmineUnigram.R
 # Load required packages
 library(dplyr) 
@@ -13,7 +14,7 @@ tokenizeReview <- function(input) {
   input %>%
     unnest_tokens(word, review)
 }
-# Apply it to datasets
+# Apply tokenizeReview-function
 tokenized_headphone <- tokenizeReview(prep_headphone_brand) # Headphones
 tokenized_cellphone <- tokenizeReview(prep_cellphone_brand) # Cellphones
 tokenized_coffee <- tokenizeReview(prep_coffee_brand) # Coffee Makers 
@@ -24,7 +25,7 @@ removeStopwords <- function(input){
   input %>%
     anti_join(stop_words) # perform anti-join to stop_words
 } 
-# Apply to tokenized dataset
+# Apply removeStopwords-function
 tokenized_headphone_filtered <- removeStopwords(tokenized_headphone) # Headphones
 tokenized_cellphone_filtered <- removeStopwords(tokenized_cellphone) # Cellphones
 tokenized_coffee_filtered <- removeStopwords(tokenized_coffee) # Coffee Makers 
@@ -37,7 +38,7 @@ countWords <- function(input, unwanted) {
     filter(!word %in% unwanted) %>%
     count(word, sort = TRUE) 
 }
-# Count Top Words excluding unwanted 
+# Apply countWords-function
 wf_headphone <- countWords(tokenized_headphone_filtered, c("headphone", "buy", "product"))
 wf_cellphone <- countWords(tokenized_cellphone_filtered, c("phone", "buy", "product", "2", "3", "4", "34"))
 wf_toaster <- countWords(tokenized_toaster_filtered, c("toaster", "toast", "buy", "product", "2", "4"))
@@ -109,7 +110,7 @@ plotWordDistribution <- function(input1, input2, input3, input4, title) {
     xlim(NA, 0.0009) +
     facet_wrap(~Category, ncol = 2, scales = "free_y")
 }
-# Apply Function
+# Apply plotWordDistribution-function
 plotWordDistribution(headphoneWords, cellphoneWords, toasterWords, coffeeWords, "XY")
 plotWordDistribution(headphoneWords, "Headphones")
 plotWordDistribution(cellphoneWords, "Cellphones")
@@ -231,5 +232,5 @@ plotTFIDFbrand <- function(input, brandList) {
     ggtitle("TF-IDF Top-Brands") +
     coord_flip()
 }
-# Apply Function
+# Apply plotTFIDFbrand-function
 plotTFIDFbrand(headphoneBrandTFIDF, top10brands_headphone)

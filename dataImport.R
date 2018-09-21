@@ -1,6 +1,6 @@
-# SENTIMENT ANALYSIS ON ONLINE REVIEWS #
+# GENERAL DATA IMPORT
 # dataImport.R
-# LOAD PACKAGES
+# Load required packages
 library(data.table)
 library(dplyr)
 libraries <- c("dplyr", "tibble", "ndjson", "tm", "dplyr", "tidytext", "ggplot2", "qdap", "wordcloud", "textmineR", "lubridate", "widyr", "ggraph", "igraph")

@@ -1,5 +1,5 @@
-# predictScore.R
 # XGBOOST CLASSIFIER
+# predictScore.R
 # Load required packages
 library(text2vec)
 library(xgboost)
@@ -18,7 +18,7 @@ sampleData <- function(input){
   sample <- sample.int(n = nrow(input), size = floor(.3*nrow(input)), replace = F)
   return(sample)
 }
-# Apply sampleData Function
+# Apply sampleData-function
 sampleHeadphones <- sampleData(prep_headphone_brand)
 sampleCellphone <- sampleData(prep_cellphone_brand)
 sampleCoffee <- sampleData(prep_coffee_brand)
@@ -42,7 +42,7 @@ removeXGsw <- function(input, stopword_list){
     mutate(review = map(data, unlist), # create review column and glue the terms together again
            review = map_chr(review, paste, collapse = " ")) # separate by a blank
 }
-# Apply Function
+# Apply removeXGsw-function
 mediateHeadphone <- removeXGsw(mediateHeadphone, stopword_list)
 mediateCellphone <- removeXGsw(mediateCellphone, stopword_list)
 mediateCoffee <- removeXGsw(mediateCoffee, stopword_list)
@@ -74,7 +74,7 @@ createVoc <- function(input){
                            tokenizer = word_tokenizer))
   return(vocab)
 }
-# Apply createVoc Function
+# Apply createVoc-function
 vocabHeadphone <- createVoc(mediateHeadphone)
 vocabCellphone <- createVoc(mediateCellphone)
 vocabCoffee <- createVoc(mediateCoffee)
@@ -86,7 +86,7 @@ createDTM <- function(input, vocab){
   dtm <- create_dtm(itoken(input$review, tokenizer = word_tokenizer), vocab_vectorizer(vocab))
   return(dtm)
 }
-# Apply createDTM Function
+# Apply createDTM-function
 # Train
 dtm_trainHeadphone <- createDTM(trainHeadphone, vocabHeadphone)
 dtm_trainCellphone <- createDTM(trainCellphone, vocabCellphone)
@@ -116,7 +116,7 @@ testScoreCoffee <- testCoffee$scoreNN
 trainScoreToaster <- trainToaster$scoreNN
 testScoreToaster <- testToaster$scoreNN
 
-# CREATE XGB MATRIX
+# CREATE XGB-MATRIX
 # Turn the DTM into an XGB matrix using the sentiment scores that are to be learned
 xgbMTrainHeadphone <- xgb.DMatrix(dtm_trainHeadphone, label = trainScoreHeadphone)
 xgbMTestHeadphone <- xgb.DMatrix(dtm_testHeadphone, label = testScoreHeadphone)
@@ -130,7 +130,7 @@ xgbMTestCoffee <- xgb.DMatrix(dtm_testCoffee, label = testScoreCoffee)
 xgbMTrainToaster <- xgb.DMatrix(dtm_trainToaster, label = trainScoreToaster)
 xgbMTestToaster <- xgb.DMatrix(dtm_testToaster, label = testScoreToaster)
 
-# Create a watchlist
+# CREATE WATCHLIST FOR PERFORMANCE MONITORING 
 watchlistHeadphone <- list(validation = xgbMTestHeadphone, train=xgbMTrainHeadphone)
 watchlistCellphone <- list(validation = xgbMTestCellphone, train=xgbMTrainCellphone)
 watchlistCoffee <- list(validation = xgbMTestCoffee, train=xgbMTrainCoffee)
@@ -148,7 +148,7 @@ trainXGB <- function(train_matrix, xgb_params, watchlist){
   xgb_fit <- xgb.train(params = xgb_params, data = train_matrix, nrounds = 10000, watchlist = watchlist, early_stopping_rounds = 20, maximize = FALSE) # with verify process
   return(xgb_fit)
 }
-# Apply trainXGB Function
+# Apply trainXGB-function
 xgbHeadphone <- trainXGB(xgbMTrainHeadphone, xgb_params, watchlistHeadphone)
 xgbCellphone <- trainXGB(xgbMTrainCellphone, xgb_params, watchlistCellphone)
 xgbCoffee <- trainXGB(xgbMTrainCoffee, xgb_params, watchlistCoffee)
@@ -162,7 +162,7 @@ xgbImpVar <- function(input, cols){
   importance_vars <- xgb.importance(model=input, feature_names = colnames(cols))
   return(importance_vars)
 }
-# Apply xgbImpVar Function
+# Apply xgbImpVar-function
 importanceHeadphone <- xgbImpVar(xgbHeadphone, xgbMTrainHeadphone)
 importanceCellphone <- xgbImpVar(xgbCellphone, xgbMTrainCellphone)
 importanceCoffee <- xgbImpVar(xgbCoffee, xgbMTrainCoffee)
@@ -173,7 +173,7 @@ xgbImpVarClean <- function(input){
   importance_clean <- input[,`:=`(Cover=NULL, Frequency=NULL)]
   return(importance_clean)
 }
-# Apply xgbImpVarClean Function
+# Apply xgbImpVarClean-function
 importanceHeadphone <- xgbImpVarClean(importanceHeadphone)
 importanceCellphone <- xgbImpVarClean(importanceCellphone)
 importanceCoffee <- xgbImpVarClean(importanceCoffee)
@@ -185,6 +185,7 @@ xgbPlot <- function(input, var){
   ggtitle(paste("Variable Importance for the XGBOOST model of", var, sep=" ")) 
   #+ geom_bar(stat = "identity", width = 10)
 }
+# Apply xgbPlot-function
 xgbPlot(importanceCoffee, "Coffee")
 
 # PRINT MOST IMPORTANT FEATURES

@@ -1,5 +1,8 @@
+# DATA PREPARATION
 # dataPrep.R
+# Load required packages
 library(dplyr)
+
 # PREPARE COLUMNS OF THE RAW REVIEW DATA
 prepColumns <- function(input) {
   # Combine two columns

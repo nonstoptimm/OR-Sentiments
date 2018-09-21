@@ -1,6 +1,6 @@
+# DATA CLEANING
 # dataCleaning.R
-# Script to clean the data
-# Required Packages
+# Load required packages
 library(dplyr)
 library(tidyverse)
 library(textstem)

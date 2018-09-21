@@ -1,5 +1,5 @@
+# TEXT MINING OF BIGRAMS
 # textBigram.R
-# TEXT MINING FOR BIGRAMS
 # Load required packages
 library(dplyr)
 library(tidytext) # unnest_tokens
@@ -120,5 +120,5 @@ plotNotWords <- function(input, text, selectBrand) {
 # Apply plotNotWords-function
 plotNotWords(prep_headphone_brand, "Headphones", "")
 plotNotWords(prep_cellphone_brand, "Cellphones", "")
-plotNotWords(prep_toaster_brand, "Toasters")  
-plotNotWords(prep_coffee_brand, "Coffee")
+plotNotWords(prep_toaster_brand, "Toasters", "")  
+plotNotWords(prep_coffee_brand, "Coffee", "")

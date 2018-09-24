@@ -104,13 +104,15 @@ top10brands_toaster <- setPriceGroups(top10brands_toaster, avgPriceToaster, 50, 
 
 # DETECT MOST POPULAR PRODUCTS
 countBrandsProduct <- function(input){
-  input %>%
+  input <- input %>%
     group_by(title) %>% 
     summarise(reviewCount = n()) %>% 
     arrange(desc(reviewCount))
+  return(input[1:10,])  
 }
 # Apply countBrandsProduct-function
-countBrandsProduct(prep_headphone_brand)
-countBrandsProduct(prep_coffee_brand)
-countBrandsProduct(prep_toaster_brand)
-countBrandsProduct(prep_cellphone_brand)
+top10products_headphone <- countBrandsProduct(prep_headphone_brand)
+top10products_cellphone <- countBrandsProduct(prep_cellphone_brand)
+top10products_coffee <- countBrandsProduct(prep_coffee_brand)
+top10products_toaster <- countBrandsProduct(prep_toaster_brand)
+

@@ -12,8 +12,8 @@ tokenizeReview <- function(input) {
     unnest_tokens(word, review)
 }
 # Apply tokenizeReview-function
-tokenized_headphone <- tokenizeReview(prep_headphone_brand) # Headphones
 tokenized_cellphone <- tokenizeReview(prep_cellphone_brand) # Cellphones
+tokenized_headphone <- tokenizeReview(prep_headphone_brand) # Headphones
 tokenized_coffee <- tokenizeReview(prep_coffee_brand) # Coffee Makers 
 tokenized_toaster <- tokenizeReview(prep_toaster_brand) # Toaster
 
@@ -49,8 +49,8 @@ getSentimentAFINN <- function(input) {
     ungroup()
 }
 # Apply sentimentReview-function
-sentimentReviewHeadphone <- getSentimentAFINN(tokenized_headphone) # Headphones
 sentimentReviewCellphone <- getSentimentAFINN(tokenized_cellphone) # Cellphones
+sentimentReviewHeadphone <- getSentimentAFINN(tokenized_headphone) # Headphones
 sentimentReviewToaster <- getSentimentAFINN(tokenized_toaster) # Toaster
 sentimentReviewCoffee <- getSentimentAFINN(tokenized_coffee) # Coffee
 
@@ -61,7 +61,7 @@ sentimentScoreAFINN <- function(input, brandList) {
     filter(brand %in% brandList$brand) %>%
     inner_join(get_sentiments("afinn"), by = "word") %>%
     group_by(brand) %>%
-    summarize(scoreAFINN = sum(score * n) / sum(n))
+    summarize(meanLX = sum(score * n) / sum(n))
   input <- left_join(input, brandList, by = "brand")
 }
 # Apply sentimentScoreAFINN-function
@@ -72,13 +72,14 @@ scoreCoffeeAFINN <- sentimentScoreAFINN(wf_coffee_brand, top10brands_coffee)
 
 # ADD SENTIMENT SCORE PER TOP BRAND
 addBrandScore <- function(input, aggregated, brandList) {
-  input %>% 
+  input <- input %>% 
     filter(brand %in% brandList$brand) %>%
     group_by(brand) %>%
     summarize(meanNN = mean(scoreNN)) %>% 
     arrange(brand) %>% 
     select(brand, meanNN) %>% 
     left_join(aggregated, by = "brand")
+  input <- input[, c("properBrand", "brand", "reviewCount", "meanStar", "meanLX", "meanNN", "avgPrice", "priceGroup")]
 }
 # Apply addBrandScore-function
 scoreHeadphoneBrand <-   addBrandScore(prep_headphone_brand, scoreHeadphoneAFINN, top10brands_headphone)
@@ -87,36 +88,36 @@ scoreToasterBrand <- addBrandScore(prep_toaster_brand, scoreToasterAFINN, top10b
 scoreCoffeeBrand <- addBrandScore(prep_coffee_brand, scoreCoffeeAFINN, top10brands_coffee)
 
 # PLOT SENTIMENT SCORE BASED ON BRAND
-plotSentimentScore <- function(input, names, text, scoreChoice, ylim) {
-  input$brand <- names
+plotSentimentScore <- function(input, text, scoreChoice, ylim) {
   if(scoreChoice == "ML-Model") {
     input$score <- input$meanNN    
   } else if(scoreChoice == "Lexicon") {
-    input$score <- input$scoreAFINN
+    input$score <- input$meanLX
   }
   input %>%
-    mutate(brand = reorder(brand, score)) %>%
-    ggplot(aes(brand, score, fill = priceGroup)) +
+    mutate(properBrand = reorder(properBrand, score)) %>%
+    ggplot(aes(properBrand, score, fill = priceGroup)) +
       geom_col(colour="black") +
       coord_flip() +
       ylim(ylim) +
       xlab("Brand") +
-      ylab(paste("Average sentiment score (", scoreChoice, ")", sep = "")) +
+      ylab(paste("Average Sentiment Score (", scoreChoice, ")", sep = "")) +
       ggtitle(paste("Mean Score for Brands in ", text, "-Category (", scoreChoice, ")", sep = "")) +
       geom_hline(aes(yintercept = mean(score), color="Mean"), size=1) +
       geom_label(aes(label = meanStar), color = "black", show.legend = FALSE, hjust = + 1.2) +
+      theme(text = element_text(size=11, family="LM Roman 10")) +
       scale_fill_brewer(name = "Price Segment") +
       scale_color_manual(name = "Statistics", values = c(Mean = "red"))
 }
 # Apply plotSentimentScoreAFINN-function
-plotSentimentScore(scoreHeadphoneBrand, nameBrandHeadphone,"Headphones", "Lexicon", c(0, 1.7)) 
-plotSentimentScore(scoreCellphoneBrand, nameBrandCellphone , "Cellphones", "Lexicon", c(0, 1.7))
-plotSentimentScore(scoreToasterBrand, nameBrandToaster, "Toaster", "Lexicon", c(0, 1.7)) 
-plotSentimentScore(scoreCoffeeBrand, nameBrandCoffee, "Coffee", "Lexicon", c(0, 1.7)) 
-plotSentimentScore(scoreHeadphoneBrand, nameBrandHeadphone, "Headphones", "ML-Model", c(-0.1, 0.6)) 
-plotSentimentScore(scoreCellphoneBrand, nameBrandCellphone, "Cellphones", "ML-Model", c(-1.3, 0.3)) 
-plotSentimentScore(scoreToasterBrand, nameBrandToaster, "Toaster", "ML-Model", c(-0.2, 0.6))
-plotSentimentScore(scoreCoffeeBrand, nameBrandCoffee, "Coffee", "ML-Model",  c(-0.4, 0.730)) 
+plotSentimentScore(scoreHeadphoneBrand,"Headphones", "Lexicon", c(0, 1.7)) 
+plotSentimentScore(scoreCellphoneBrand, "Cellphones", "Lexicon", c(0, 1.7))
+plotSentimentScore(scoreToasterBrand, "Toaster", "Lexicon", c(0, 1.7)) 
+plotSentimentScore(scoreCoffeeBrand, "Coffee", "Lexicon", c(0, 1.7)) 
+plotSentimentScore(scoreHeadphoneBrand, "Headphones", "ML-Model", c(-0.1, 0.6)) 
+plotSentimentScore(scoreCellphoneBrand, "Cellphones", "ML-Model", c(-1.3, 0.3)) 
+plotSentimentScore(scoreToasterBrand, "Toaster", "ML-Model", c(-0.25, 0.48))
+plotSentimentScore(scoreCoffeeBrand, "Coffee", "ML-Model",  c(-0.5, 0.730)) 
 
 # SENTIMENT CONTRIBUTION
 sentiContributions <- function(input) {

@@ -5,68 +5,85 @@ library(dplyr)
 library(ggplot2)
 
 # CREATE BOXPLOT FOR TOPIC-SENTIMENT
-topicBoxplot <- function(input, category, brand){
-  input$mainTopic <- as.factor(input$mainTopic)
-  if(brand == ""){
-    plot <- ggplot(input, aes(x=mainTopic, y=scoreNN)) + 
-      geom_boxplot() +
-      ggtitle(paste("Topic-oriented Sentiment-Score", category, sep = " ")) +
-      ylim(-3, 3)
+topicBoxplot <- function(input, category, topBrands, brandSelect, ylim){
+  input$mainTopic <- as.factor(input$mainTopic) # as factor for boxplot
+  if(brandSelect != "") {
+  properBrand <- topBrands %>% # as we want to have pretty names
+    filter(brand == brandSelect) %>%
+    select(properBrand)
+  input <- input %>% 
+    filter(brand == brandSelect)
+  category <- paste(category, ' (Brand \"', properBrand, '\")', sep = "")
   }
-  plot <- input %>% 
-    filter(brand == brand) %>%
-    ggplot(input, aes(x=mainTopic, y=scoreNN)) + 
-    geom_boxplot() +
-    ggtitle(paste("Topic-oriented Sentiment-Score for", brand, category, sep = " ")) +
-    ylim(-3, 3)
-  return(plot)
+  ggplot(input) + 
+      aes(x = mainTopic, y = scoreNN) + 
+      geom_boxplot() +
+      ggtitle(paste("Topic-oriented Sentiment-Scores for", category, sep = " ")) +
+      ylim(ylim)
 }
 # Apply topicBoxplot-function
-topicBoxplot(merged_topic_cellphone, "Cellphones", "apple")
-apple <- merged_topic_cellphone %>% filter(brand == "apple")
-samsung <- merged_topic_cellphone %>% filter(brand == "samsung")
-lenovo <- merged_topic_cellphone %>% filter(brand == "lenovo")
-sony <- merged_topic_cellphone %>% filter(brand == "sony")
-google <- merged_topic_cellphone %>% filter(brand == "google")
+topicBoxplot(merged_topic_cellphone, "Cellphones", "", "", c(-4.3,2.5))
+lapply(top10brands_cellphone$brand, function(brandSelect) topicBoxplot(merged_topic_cellphone, "Cellphone", top10brands_cellphone, brandSelect, c(-4.3,2.5)))
 
-topicBoxplot(apple)
-topicBoxplot(samsung)
-topicBoxplot(lenovo)
-topicBoxplot(sony)
-topicBoxplot(google)
-topicBoxplot(nokia)
+topicBoxplot(merged_topic_headphone, "Headphones", "", "", c(-4.3,2.5))
+lapply(top10brands_headphone$brand, function(brandSelect) topicBoxplot(merged_topic_headphone, "Headphone", top10brands_headphone, brandSelect, c(-4.3,2.5)))
 
-# SCORE-DENSITY-PLOT FOR EACH TOPIC
-densityTopic <- function(input, category, topic){
-  input %>% 
-    filter(mainTopic == topic) %>%
-    ggplot(diamonds, aes(scoreNN)) +
-      geom_density() +
-      ggtitle(paste("Density plot of ", category, "-Topic Nr.", topic, sep=""))
-}
-# Apply densityTopic-function
-densityTopic()
+topicBoxplot(merged_topic_toaster, "Toasters", "", "", c(-4.1,3))
+lapply(top10brands_toaster$brand, function(brandSelect) topicBoxplot(merged_topic_toaster, "Toaster", top10brands_toaster, brandSelect, c(-4.1,3)))
 
-# KOLMOGOROV-TEST
-ksTestTopic <- function(input, topic){
-  input <- input %>% filter(mainTopic == topic)
-  test <- ks.test(input$scoreNN, "pnorm")  
-}
-# Apply kTestTopic-function
-ksTestTopic()
+topicBoxplot(merged_topic_coffee, "Coffee", "", "", c(-4.4,2.7))
+lapply(top10brands_coffee$brand, function(brandSelect) topicBoxplot(merged_topic_coffee, "Coffee", top10brands_coffee, brandSelect, c(-4.1,3)))
 
 # MEAN-SCORE FOR EACH TOPIC
-meanScoreTopic <- function(input){
+meanScoreTopic <- function(input, brandSelect){
+  if(brandSelect != "") {
+    input <- input %>% 
+      filter(brand == brandSelect)
+  }
   input %>% 
     group_by(mainTopic) %>%
     summarise(AvgScore=mean(scoreNN))
 }
 # Apply meanScoreTopic-function
+meanScoreTopic(merged_topic_cellphone, "")
+meanScoreTopic(merged_topic_headphone, "")
+meanScoreTopic(merged_topic_toaster, "")
+meanScoreTopic(merged_topic_coffee, "")
+topicScoreCellphone <- lapply(top10brands_cellphone$brand, function(brandSelect) meanScoreTopic(merged_topic_cellphone, brandSelect))
+topicScoreHeadphone <- lapply(top10brands_headphone$brand, function(brandSelect) meanScoreTopic(merged_topic_headphone, brandSelect))
+topicScoreToaster <- lapply(top10brands_toaster$brand, function(brandSelect) meanScoreTopic(merged_topic_toaster, brandSelect))
+topicScoreCoffee <- lapply(top10brands_coffee$brand, function(brandSelect) meanScoreTopic(merged_topic_coffee, brandSelect))
 
 # KRUSKAL WALLIS TEST
 kwTest <- function(input){
-  input %>%
-    
+  input$mainTopic <- as.factor(input$mainTopic)
+  kruskal.test(scoreNN ~ mainTopic, data = input)
 }
 # Apply kwTest-function
-kwTest()
+kwTest(sampleScoreCellphone)
+kwTest(sampleScoreHeadphone)
+kwTest(sample_n(merged_topic_headphone, 70))
+kwTest(sample_n(merged_topic_toaster, 70))
+kwTest(sample_n(merged_topic_coffee, 70))
+
+# DATA SAMPLE
+sampleData <- function(input, n){
+  data <- sample_n(input, n)
+  return(data)
+}
+# Apply sampleData-function
+sampleScoreCellphone <- sampleData(merged_topic_cellphone, 70)
+sampleScoreHeadphone <- sampleData(merged_topic_headphone, 100)
+
+# SHAPIRO TEST
+shapiro.test(sampleScoreCellphone$scoreNN)
+shapiro.test(sampleScoreHeadphone$scoreNN)
+
+# ANOVA-TEST 
+anovaTest <- function(input){
+  input$mainTopic <- as.factor(input$mainTopic)
+  summary(aov(input$scoreNN ~ input$mainTopic))
+}
+# Apply anovaTest-function
+anovaTest(sampleScoreCellphone)
+anovaTest(sampleScoreHeadphone)

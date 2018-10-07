@@ -25,20 +25,6 @@ calcMinMaxMedianMean(prep_coffee_brand$scoreNN)
 
 # MEAN FOR SENTIMENT SCORE: 
 # LX/OVERALL
-calcMeanScoreNN <- function(input) {
-  mean_overall <- mean(input$overall)
-  mean_score_total <- mean(input$scoreNN)
-  mean_scores <- c()
-  mean_scores <- c(mean_scores, mean_overall, mean_score_total)
-  for(star in 1:5) {
-    current_score <- input %>% filter(overall == star) %>% summarise(mean(scoreNN))
-    mean_scores <- c(mean_scores, current_score)
-  }
-  mean_scores <- round(as.numeric(mean_scores), 5)
-  names(mean_scores) <- c("Mean Stars", "Mean Score", "MS1", "MS2", "MS3", "MS4", "MS5")
-  return(as.data.frame(mean_scores))
-}
-# ML/OVERALL
 calcMeanScoreLX <- function(input) {
   mean_overall <- mean(input$overall)
   mean_score_total <- mean(input$scoreLX)
@@ -52,13 +38,27 @@ calcMeanScoreLX <- function(input) {
   names(mean_scores) <- c("Mean Stars", "Mean Score", "MS1", "MS2", "MS3", "MS4", "MS5")
   return(as.data.frame(mean_scores))
 }
-# Calculate Means for Sentiment Scores
-# Headphone
-calcMeanScoreLX(prep_headphone_brand)
-calcMeanScoreNN(prep_headphone_brand)
+# ML/OVERALL
+calcMeanScoreNN <- function(input) {
+  mean_overall <- mean(input$overall)
+  mean_score_total <- mean(input$scoreNN)
+  mean_scores <- c()
+  mean_scores <- c(mean_scores, mean_overall, mean_score_total)
+  for(star in 1:5) {
+    current_score <- input %>% filter(overall == star) %>% summarise(mean(scoreNN))
+    mean_scores <- c(mean_scores, current_score)
+  }
+  mean_scores <- round(as.numeric(mean_scores), 5)
+  names(mean_scores) <- c("Mean Stars", "Mean Score", "MS1", "MS2", "MS3", "MS4", "MS5")
+  return(as.data.frame(mean_scores))
+}
+# Apply calcMeanScoreLX/NN-function
 # Cellphone
 calcMeanScoreLX(prep_cellphone_brand)
 calcMeanScoreNN(prep_cellphone_brand)
+# Headphone
+calcMeanScoreLX(prep_headphone_brand)
+calcMeanScoreNN(prep_headphone_brand)
 # Toaster
 calcMeanScoreLX(prep_toaster_brand)
 calcMeanScoreNN(prep_toaster_brand)
@@ -93,7 +93,7 @@ calcVarScoreNN <- function(input) {
   names(var_scores) <- c("VarG", "Var1", "Var2", "Var3", "Var4", "Var5")
   return(as.data.frame(var_scores))
 }
-# Calculate Variance Deviation for Sentiment Scores
+# Apply calcVarScoreLX/NN-function
 # Headphone
 calcVarScoreLX(prep_headphone_brand)
 calcVarScoreNN(prep_headphone_brand)
@@ -134,13 +134,13 @@ calcSdScoreNN <- function(input) {
   names(sd_scores) <- c("SdG", "Sd1", "Sd2", "Sd3", "Sd4", "Sd5")
   return(as.data.frame(sd_scores))
 }
-# Calculate Standard Deviation for Sentiment Scores
-# Headphone
-calcSdScoreLX(prep_headphone_brand)
-calcSdScoreNN(prep_headphone_brand)
+# Apply calcSdScoreLX/NN-function
 # Cellphone
 calcSdScoreLX(prep_cellphone_brand)
 calcSdScoreNN(prep_cellphone_brand)
+# Headphone
+calcSdScoreLX(prep_headphone_brand)
+calcSdScoreNN(prep_headphone_brand)
 # Toaster
 calcSdScoreLX(prep_toaster_brand)
 calcSdScoreNN(prep_toaster_brand)
@@ -160,12 +160,12 @@ corrCoeffNN <- function(input) {
   return(correlation)
 }
 # Calculate Correlation Coefficient for Sentiment Scores
-# Headphone
-corrCoeffLX(prep_headphone_brand)
-corrCoeffNN(prep_headphone_brand)
 # Cellphone
 corrCoeffLX(prep_cellphone_brand)
 corrCoeffNN(prep_cellphone_brand)
+# Headphone
+corrCoeffLX(prep_headphone_brand)
+corrCoeffNN(prep_headphone_brand)
 # Toaster
 corrCoeffLX(prep_toaster_brand)
 corrCoeffNN(prep_toaster_brand)

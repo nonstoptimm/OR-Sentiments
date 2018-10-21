@@ -26,28 +26,32 @@ countHit(raw_homekitchen)
 
 # PLOT BARCHART
 plotBarchart <- function(input1, input2, input3, input4){
-  merged <- do.call("rbind", list(input1, input2, input3, input4))
+  merged <- do.call("rbind", list(input1, input2, input3, input4)) # append all rows
   merged <- merged %>% 
     group_by(category, overall) %>% 
     summarise(count=n()) %>% 
-    mutate(perc=count/sum(count))
-  ggplot(merged, aes(x = factor(category), y = perc*100, fill = factor(overall))) +
-    geom_bar(stat="identity", width = 0.7) +
+    mutate(perc = count/sum(count)) %>% # Calculate Percentage
+    ungroup()
+  ggplot(merged, aes(x = factor(category), y = perc * 100, fill = factor(overall))) +
+    geom_bar(stat = "identity", width = 0.7) +
     labs(x = "Category", y = "Percent", fill = "Star Rating") +
     scale_fill_brewer(palette="RdYlGn") +
-    ggtitle("Percentage distribution of Star Ratings") +
+    #ggtitle("Percentage distribution of Star Ratings") +
+    theme(text = element_text(size = 15, family = "LM Roman 10")) + # Latex Font
     coord_flip()
 }
 # Apply plotBarchart-function
 plotBarchart(prep_coffee_brand, prep_toaster_brand, prep_cellphone_brand, prep_headphone_brand)
 
 # PLOT HISTORGAM FOR OVERALL RATING
+# Not included in Master Thesis Document, as substituted by plotBarchart
 plotHistogram <- function(input, title, xdesc, .) {
   ggplot(input, aes(.)) +
     geom_histogram(binwidth = 0.5) +
     labs(x = xdesc, y = "n") +
     geom_vline(aes(xintercept=mean(.), color="mean"), size=1) +
     scale_color_manual(name = "Statistics", values = c(mean = "red")) +
+    # theme(text = element_text(size = 12, family = "LM Roman 10")) + # Latex Font
     ggtitle(paste("Histogram of ", title, sep = ""))
 }
 # Apply plotHistogram-function
@@ -143,4 +147,3 @@ detectProducts <- function(input, brandSelect){
 # Apply detectProducts-function
 detectProducts(prep_cellphone_brand, "apple")
 detectProducts(prep_cellphone_brand, "samsung")
-

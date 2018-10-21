@@ -5,13 +5,13 @@ library(dplyr)
 library(tidyverse)
 library(textstem)
 
-# SAPPLY TOLOWER
+# MAKE TEXT LOWER-CASE
 makeLow <- function(input) {
   input$review <- sapply(input$review, tolower) # make review low
   input$brand <- sapply(input$brand, tolower) # make brand name low
   return(input)
 }
-# Apply makeLow Function
+# Apply makeLow-function
 merged_cellphone_brand <- makeLow(merged_cellphone_brand)
 merged_coffee_brand <- makeLow(merged_coffee_brand)
 merged_headphone_brand <- makeLow(merged_headphone_brand)
@@ -27,7 +27,7 @@ correctContraction <- function(reviews, contraction_list) {
   }
   return(reviews)
 }
-# Apply correctContraction Function
+# Apply correctContraction-function
 merged_cellphone_brand$review <- correctContraction(merged_cellphone_brand$review, contraction_list)
 merged_coffee_brand$review <- correctContraction(merged_coffee_brand$review, contraction_list)
 merged_headphone_brand$review <- correctContraction(merged_headphone_brand$review, contraction_list)
@@ -39,7 +39,7 @@ correctWord <- function(input, before, after) {
   reviews <- gsub(before, after, input, ignore.case =TRUE)
   return(reviews)
 }
-# Apply correctWord Function
+# Apply correctWord-function
 prep_toaster_brand$review <- correctWord(prep_toaster_brand$review, "toaster", "toast")
 
 # REMOVE PUNCTUATION AND CORRECT FURTHER SIGNS
@@ -53,7 +53,7 @@ removePunctuation <- function(reviews) {
   reviews <- gsub("\\W", " ", reviews)
   return(reviews)
 }
-# Apply removePunctuation Function
+# Apply removePunctuation-function
 merged_cellphone_brand$review <- removePunctuation(merged_cellphone_brand$review)
 merged_coffee_brand$review <- removePunctuation(merged_coffee_brand$review)
 merged_headphone_brand$review <- removePunctuation(merged_headphone_brand$review)
@@ -64,7 +64,7 @@ correctAnd <- function(input) {
   input <- gsub("\\&amp;", "&", input)
   return(input)
 }
-# Apply correctAnd Function
+# Apply correctAnd-function
 merged_cellphone_brand$title <- gsub("\\&amp;", "&", merged_cellphone_brand$title)
 merged_cellphone_brand$brand <- gsub("\\&amp;", "&", merged_cellphone_brand$brand)
 prep_toaster_brand$title <- gsub("\\&amp;", "&", prep_toaster_brand$title)
@@ -75,7 +75,7 @@ lemmatizeText <- function(input) {
   input %>% 
     lemmatize_strings() # words are transformed to their origin
 }
-# Apply to dataset
+# Apply lemmatizeText-function
 prep_cellphone_brand$review <- lemmatizeText(prep_cellphone_brand$review)
 prep_coffee_brand$review <- lemmatizeText(prep_coffee_brand$review)
 prep_toaster_brand$review <- lemmatizeText(prep_toaster_brand$review)

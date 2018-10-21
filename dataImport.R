@@ -3,8 +3,6 @@
 # Load required packages
 library(dplyr)
 library(data.table)
-libraries <- c("dplyr", "tibble", "ndjson", "tm", "dplyr", "tidytext", "ggplot2", "qdap", "wordcloud", "textmineR", "lubridate", "widyr", "ggraph", "igraph")
-lapply(libraries, require, character.only = TRUE)
 
 # IMPORT THE RAW DATA
 raw_electronics <- ndjson::stream_in("/Volumes/OMEGA/Dataset/rawdata/raw_electronics_reviews.json")
@@ -16,12 +14,6 @@ meta_homekitchen <- ndjson::stream_in("/Volumes/OMEGA/Dataset/rawdata/raw_homeki
 
 # IMPORT CONTRACTION/SUBSTITUTION LIST
 contraction_list <- read.csv("input-data/contractions.csv", header = TRUE, sep = ";")
-
-# IMPORT INDIVIDUAL STOPWORDS
-stopword_list <- read.csv("input-data/stopwords.csv", header = TRUE, sep = ";")
-stopword_list <- unlist(stopword_list$word)
-stopword_list <- as.character(stopword_list)
-stopword_list <- as_tibble(stopword_list)
 
 # IMPORT THE SENTIMENT SCORES FROM DEEP LEARNING MODEL
 # Calculated separately using Microsoft Azure
@@ -49,6 +41,8 @@ prep_coffee_brand <- as_tibble(fread("output/prep_coffee_brand-filtered.csv"))
 # 
 top10brands_cellphone <- as_tibble(fread("output/TopBrands/top10brands_cellphone.csv"))
 top10brands_headphone <- as_tibble(fread("output/TopBrands/top10brands_headphone.csv"))
+top10brands_toaster <- as_tibble(fread("output/TopBrands/top10brands_toaster.csv"))
+top10brands_coffee <- as_tibble(fread("output/TopBrands/top10brands_coffee.csv"))
 
 # IMPORT PREPARED DATASETS WITHOUT RELEVANT WORDS
 merged_topic_cellphone <- as_tibble(fread("output/DataWithTopic/mergedTopicCellphone.csv"))
@@ -69,7 +63,7 @@ xgbHeadphone <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Headpho
 xgbCellphone <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Cellphone.rds")
 xgbToaster <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Toaster.rds")
 xgbCoffee <- readRDS("/Volumes/OMEGA/Dataset/prepared_data/XGBOOST/XG_Coffee.rds")
-xgbHeadphone <- xgb.load("output/XGBOOST/XG_Headphone")
+xgbHeadphone <- xgb.load("output/XGBOOST/2018-09-25-XG_Headphones-noStopwordsAtAll")
 xgbCellphone <- xgb.load("output/XGBOOST/XG_Cellphone")
 xgbCoffee <- xgb.load("output/XGBOOST/XG_Coffee")
 xgbToaster <- xgb.load("output/XGBOOST/XG_Toaster")

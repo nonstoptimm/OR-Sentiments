@@ -2,9 +2,9 @@
 # textBigram.R
 # Load required packages
 library(dplyr)
-library(tidytext) # unnest_tokens
 library(ggplot2)
 library(tidyr) # spread/gather/separate
+library(tidytext) # unnest_tokens
 
 # TOKENIZE THE INPUT DATA INTO BIGRAMS
 tokenizeBigrams <- function(input) {
@@ -17,15 +17,6 @@ tokenized_headphone_bigram <- tokenizeBigrams(prep_headphone_brand)
 tokenized_toaster_bigram <- tokenizeBigrams(prep_toaster_brand)
 tokenized_cellphone_bigram <- tokenizeBigrams(prep_cellphone_brand)
 tokenized_coffee_bigram <- tokenizeBigrams(prep_coffee_brand)
-
-# COUNTING WORDS (FUNCTION FOR WITH AND WITHOUT STOPWORDS)
-countBigram <- function(input) {
-  input %>%
-    count(bigram, sort = TRUE)
-}
-# Apply countBigram-function
-# No count on the unfiltered data, as it would not make sense (stopwords would appear)
-# Application later
 
 # SEPARATE BIGRAMS
 # to be able to filter out the stopwords
@@ -108,14 +99,15 @@ plotNotWords <- function(input, text, selectBrand) {
     mutate(word2 = reorder(paste(word2, word1, sep = "__"), contribution)) %>%
     ggplot(aes(word2, contribution, fill = contribution > 0)) +
       geom_col(show.legend = FALSE) +
-      facet_wrap(~ word1, scales = "free", nrow = 3) +
+      scale_fill_manual(values=c( "firebrick", "dodgerblue4")) +
       scale_x_discrete(labels = function(x) gsub("__.+$", "", x)) +
-      xlab("Words preceded by a negation") +
-      ylab("Sentiment score * # of occurrences") +
+      xlab("Terms preceded by \"not\"") +
+      ylab("Sentiment Score * TF") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+      theme_classic() +
       coord_flip() +
-      ggtitle(paste("Negate-Words for", text, sep = " ")) +
-      theme(text = element_text(size=16), plot.title = element_text(size = 14, face = "bold"))
+      #ggtitle(paste("Negate-Words for", text, sep = " ")) +
+      theme(text = element_text(size = 15, family = "LM Roman 10")) # Latex Font
 }
 # Apply plotNotWords-function
 plotNotWords(prep_headphone_brand, "Headphones", "")

@@ -2,8 +2,8 @@
 # sentimentDetection.R
 # Load required packages
 library(dplyr)
-library(tidytext)
 library(ggplot2)
+library(tidytext)
 
 # CREATE UNIGRAM TOKENS
 # Unnest the reviews to one word per row
@@ -43,7 +43,7 @@ getSentiment(tokenized_cellphone, "nrc")
 getSentimentAFINN <- function(input) {
   input %>%
     inner_join(get_sentiments("afinn"), by = "word") %>%
-    group_by(document) %>%
+    group_by(document) %>% # as for every document
     summarize(scoreLX = mean(score),
               words = n()) %>%
     ungroup()
@@ -82,7 +82,7 @@ addBrandScore <- function(input, aggregated, brandList) {
   input <- input[, c("properBrand", "brand", "reviewCount", "meanStar", "meanLX", "meanNN", "avgPrice", "priceGroup")]
 }
 # Apply addBrandScore-function
-scoreHeadphoneBrand <-   addBrandScore(prep_headphone_brand, scoreHeadphoneAFINN, top10brands_headphone)
+scoreHeadphoneBrand <- addBrandScore(prep_headphone_brand, scoreHeadphoneAFINN, top10brands_headphone)
 scoreCellphoneBrand <- addBrandScore(prep_cellphone_brand, scoreCellphoneAFINN, top10brands_cellphone)
 scoreToasterBrand <- addBrandScore(prep_toaster_brand, scoreToasterAFINN, top10brands_toaster)
 scoreCoffeeBrand <- addBrandScore(prep_coffee_brand, scoreCoffeeAFINN, top10brands_coffee)
@@ -94,19 +94,20 @@ plotSentimentScore <- function(input, text, scoreChoice, ylim) {
   } else if(scoreChoice == "Lexicon") {
     input$score <- input$meanLX
   }
+  input$priceGroup <- factor(scoreHeadphoneBrand$priceGroup, levels = c("Low", "Medium", "High"))
   input %>%
     mutate(properBrand = reorder(properBrand, score)) %>%
     ggplot(aes(properBrand, score, fill = priceGroup)) +
-      geom_col(colour="black") +
+      geom_col(color = "black") +
       coord_flip() +
       ylim(ylim) +
       xlab("Brand") +
       ylab(paste("Average Sentiment Score (", scoreChoice, ")", sep = "")) +
-      ggtitle(paste("Mean Score for Brands in ", text, "-Category (", scoreChoice, ")", sep = "")) +
+      # ggtitle(paste("Mean Score for Brands in ", text, "-Category (", scoreChoice, ")", sep = "")) +
       geom_hline(aes(yintercept = mean(score), color="Mean"), size=1) +
-      geom_label(aes(label = meanStar), color = "black", show.legend = FALSE, hjust = + 1.2) +
-      theme(text = element_text(size=11, family="LM Roman 10")) +
-      scale_fill_brewer(name = "Price Segment") +
+      scale_fill_manual(name = "Price Segment", values=c("#00CC99", "#FDEE00", "#007FFF")) +
+      geom_label(aes(label = meanStar), color = "black", show.legend = FALSE, hjust = + 1.2, family = "LM Roman 10") +
+      theme(text = element_text(size = 15, family = "LM Roman 10")) +
       scale_color_manual(name = "Statistics", values = c(Mean = "red"))
 }
 # Apply plotSentimentScoreAFINN-function
@@ -141,42 +142,75 @@ sentiContributionPlot <- function(input, selectCategory) {
     ggplot(aes(word, contribution, fill = contribution > 0)) +
     geom_col(show.legend = FALSE) +
     coord_flip() +
-    ggtitle(paste("Sentiment Contribution within ", selectCategory, "-Category", sep = ""))
+    xlab("Sentiment Contribution") +
+    ylab("Word") +
+    theme(text = element_text(size = 15, family = "LM Roman 10")) +
+    # ggtitle(paste("Sentiment Contribution within ", selectCategory, "-Category", sep = "")) +
+    scale_fill_manual(values=c( "firebrick", "dodgerblue4"))
 }
 # Apply sentiContributionPlot-function
+png("7_ContributionHeadphone.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionHeadphone, "Headphones")
+dev.off()
+png("7_ContributionCellphone.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionCellphone, "Cellphones")
+dev.off()
+png("7_ContributionToaster.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionToaster, "Toaster")
+dev.off()
+png("7_ContributionCoffee.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionCoffee, "Coffee")
+dev.off()
 
 # CREATE BOXPLOT FOR OVERALL VS. SCORELX
 boxplotScoreLX <- function(input, cat){
+  # As factor to create x-axis-scale
   input$overall <- as.factor(input$overall)
-  ggplot(input, aes(x=overall, y=scoreLX)) + 
+  # Plot data
+  ggplot(input, aes(x = overall, y = scoreLX)) + 
     geom_boxplot() +
-    theme(text = element_text(size=18), plot.title = element_text(size = 14, face = "bold")) +
-    ylim(-4,5) +
-    #geom_hline(aes(yintercept=mean(scoreLX), color="mean"), size=1) +
-    #scale_color_manual(name = "Statistics", values = c(mean = "red")) +
-    ggtitle(paste("Lexicon-Sentiment-Score vs. Overall Rating for", cat, sep = " "))
+    xlab("Star Rating") +
+    ylab("Sentiment Score (Lexicon)") +
+    theme(text = element_text(size = 18), plot.title = element_text(size = 14, face = "bold")) +
+    # ggtitle(paste("Lexicon-Sentiment-Score vs. Overall Rating for", cat, sep = " ")) +
+    theme(text = element_text(size = 15, family = "LM Roman 10")) +
+    ylim(-4,5)
 }
 # Apply boxplotScore-function
+png("7_BoxplotHeadphoneLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_headphone_brand, "Headphones")
+dev.off()
+png("7_BoxplotCellphoneLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_cellphone_brand, "Cellphones")
+dev.off()
+png("7_BoxplotToasterLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_toaster_brand, "Toasters")
+dev.off()
+png("7_BoxplotCoffeeLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_coffee_brand, "Coffee Makers")
+dev.off()
 
 # CREATE BOXPLOT FOR OVERALL VS. SCORENN
 boxplotScoreNN <- function(input, cat){
   input$overall <- as.factor(input$overall)
-  ggplot(input, aes(x=overall, y=scoreNN)) + 
+  ggplot(input, aes(x = overall, y = scoreNN)) + 
     geom_boxplot() +
-    theme(text = element_text(size=18), plot.title = element_text(size = 14, face = "bold")) +
-    ggtitle(paste("ML-Sentiment-Score vs. Overall Rating for", cat, sep = " ")) +
+    xlab("Star Rating") +
+    ylab("Sentiment Score (ML)") +
+    theme(text = element_text(size = 18), plot.title = element_text(size = 14, face = "bold")) +
+    # ggtitle(paste("ML-Sentiment-Score vs. Overall Rating for", cat, sep = " ")) +
+    theme(text = element_text(size = 15, family = "LM Roman 10")) +
     ylim(-5,3)
 }
 # Apply boxplotScore-function
+png("7_BoxplotHeadphoneML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_headphone_brand, "Headphones")
+dev.off()
+png("7_BoxplotCellphoneML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_cellphone_brand, "Cellphones")
+dev.off()
+png("7_BoxplotToasterML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_toaster_brand, "Toasters")
+dev.off()
+png("7_BoxplotCoffeeML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_coffee_brand, "Coffee Makers")

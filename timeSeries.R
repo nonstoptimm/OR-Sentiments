@@ -1,4 +1,4 @@
-# SENTIMENT OVER TIME
+# SENTIMENT OVER TIME SIMULATION
 # timeSeries.R
 # Load required packages
 library(dplyr)
@@ -26,8 +26,8 @@ createTimeSeries <- function(input, brandList){
   return(aggregated)
 }
 # Apply createTimeSeries-function
-timeHeadphoneBrand <- createTimeSeries(merged_topic_headphone, top10brands_headphone)
 timeCellphoneBrand <- createTimeSeries(merged_topic_cellphone, top10brands_cellphone)
+timeHeadphoneBrand <- createTimeSeries(merged_topic_headphone, top10brands_headphone)
 
 # PLOT TIME SERIES FOR AVERAGE SENTIMENT SCORE
 plotTimeSeries <- function(input, brandList, category, begin, end, ylim, filterSelect){
@@ -47,22 +47,25 @@ plotTimeSeries <- function(input, brandList, category, begin, end, ylim, filterS
     geom_line(aes(y = AvgScore), size = 1) + 
     theme_classic() + 
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(title = paste("Average Sentiment Over Time for", category, sep = " "), y = "Average Sentiment", x = "Period") + 
+    labs(y = "Average Sentiment", x = "Time Period") + 
     ylim(ylim) + 
-    scale_colour_hue(name = "Brands", labels = brandList$properBrand) 
+    theme(text = element_text(size = 12, family = "LM Roman 10")) +
+    scale_colour_hue(name = "Brands", labels = brandList$properBrand)
 }
 # Apply plotTimeSeries-function
-plotTimeSeries(timeHeadphoneBrand, top10brands_headphone, "Headphones", "2013-01", "2014-03", c(-0.5,0.7), 0)
-plotTimeSeries(timeHeadphoneBrand, top10brands_headphone, "Headphones", "2013-01", "2014-03", c(-0.5,0.7), 0)
-plotTimeSeries(timeCellphoneBrand, top10brands_cellphone, "Cellphones", "2011-01", "2014-07", c(-1.7,0.7), 0)
-plotTimeSeries(timeCellphoneBrand, top10brands_cellphone, "Cellphones", "2011-02", "2014-07", c(-0.4,0.5), c("apple", "samsung")) + 
+png("8_TimeSeriesAllBrands.png", res = 300, units="in", width = 7, height = 3)
+plotTimeSeries(timeCellphoneBrand, top10brands_cellphone, "Cellphones", "2012-01", "2013-12", c(-1.7,1), 0)
+dev.off()
+png("8_TimeSeriesSelBrands.png", res = 300, units="in", width=7, height=3)
+plotTimeSeries(timeCellphoneBrand, top10brands_cellphone, "Cellphones (Apple vs. Samsung)", "2012-01", "2013-12", c(-0.4,0.5), c("apple", "samsung")) + 
   # Add lines for product launch dates
   # iPhone 5
-  geom_vline(aes(xintercept = which(levels(date) %in% "2012-10")), color="red") +
-  geom_label(stat = 'identity', aes(x = which(levels(date) %in% "2012-10"), label = "Launch Apple iPhone 5", y = 0), color = "red", angle = 90, vjust = 3, hjust = 0) +
+  geom_vline(aes(xintercept = which(levels(date) %in% "2012-10")), color="firebrick") +
+  geom_label(stat = 'identity', aes(x = which(levels(date) %in% "2012-10"), label = "Launch Apple iPhone 5", y = 0), color = "red", angle = 90, vjust = 3, hjust = 0, family = "LM Roman 10", label.size = 0.1) +
   # Samsung S3
-  geom_vline(aes(xintercept = which(levels(date) %in% "2012-05")), color="blue") +
-  geom_label(stat = 'identity', aes(x = which(levels(date) %in% "2012-05"), label = "Launch Samsung S3", y = 0), color= "blue", angle = 90, vjust = -4, hjust = 1)
+  geom_vline(aes(xintercept = which(levels(date) %in% "2012-05")), color="dodgerblue4") +
+  geom_label(stat = 'identity', aes(x = which(levels(date) %in% "2012-05"), label = "Launch Samsung S3", y = 0), color= "blue", angle = 90, vjust = -4, hjust = 0, family = "LM Roman 10", label.size = 0.1)
+dev.off()
 
 # PRODUCT-BASED TIME SERIES FOR SENTIMENT
 # We merge the same products with different colors to one product
@@ -94,7 +97,6 @@ createProductTimeSeries <- function(input, brandList){
   return(aggregated)
 }
 # Apply createTimeSeries-function
-timeHeadphoneProduct <- createProductTimeSeries(merged_topic_headphone, top10brands_headphone)
 timeCellphoneProduct <- createProductTimeSeries(productComparisonCellphone, top10brands_cellphone) # corrected data set
 
 # PLOT TIME SERIES FOR AVERAGE SENTIMENT SCORE OF PRODUCTS
@@ -110,19 +112,22 @@ plotProductTimeSeries <- function(input, productList, title, begin, end, ylim){
     geom_line(aes(y = AvgScore), size = 1) + 
     theme_classic() + 
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(title = paste("Average Sentiment Over Time for", title, sep = " "), y = "Average Sentiment", x = "Period") + 
-    scale_colour_hue(name = "Products", labels = productList) +
+    labs(y = "Average Sentiment", x = "Time Period") + 
+    scale_colour_hue(name = "Products") +
+    theme(text = element_text(size = 12, family = "LM Roman 10")) +
     ylim(ylim)
 }
 # Apply plotTimeSeries-function
-plotProductTimeSeries(timeCellphoneProduct, c("iPhone 5", "Galaxy S3"), "Apple iPhone 5 vs. Samsung S3", "2012-05", "2014-07", c(-1,1))
-  # # Add lines for product launch dates
-  # # iPhone 5
-  # geom_vline(aes(xintercept = which(levels(date) %in% "2012-10")), color = "red") +
-  # geom_label(stat = "identity", aes(x = which(levels(date) %in% "2012-10"), label = "Launch Apple iPhone 5", y = 0), color = "red", angle = 90) +
-  # # Samsung S3
-  # geom_vline(aes(xintercept = which(levels(date) %in% "2012-05")), color = "blue") +
-  # geom_label(stat = "identity", aes(x = which(levels(date) %in% "2012-05"), label = "Launch Samsung S3", y = 0), color= "blue", angle = 90)
+png("8_TimeSeriesProducts.png", res = 300, units="in", width=7, height=3)
+plotProductTimeSeries(timeCellphoneProduct, c("Galaxy S3", "iPhone 5"), "Apple iPhone 5 vs. Samsung Galaxy S3", "2012-05", "2013-12", c(-1,1)) +
+  # Add lines for product launch dates
+  # iPhone 5
+  geom_vline(aes(xintercept = which(levels(date) %in% "2012-10")), color = "red") +
+  geom_label(stat = "identity", aes(x = which(levels(date) %in% "2012-10"), label = "Launch Apple iPhone 5", y = 0), color = "red", angle = 90, vjust = 3, hjust = 0, family = "LM Roman 10") +
+  # Samsung S3
+  geom_vline(aes(xintercept = which(levels(date) %in% "2012-05")), color = "blue") +
+  geom_label(stat = "identity", aes(x = which(levels(date) %in% "2012-05"), label = "Launch Samsung S3", y = 0), color= "blue", angle = 90, vjust = -4, hjust = 0, family = "LM Roman 10")
+dev.off()
 
 # CREATE TIME SERIES FOR AVERAGE TOPIC DISTRIBUTION
 createTopicSeries <- function(input, brandSelect){
@@ -147,14 +152,14 @@ createTopicSeries <- function(input, brandSelect){
   return(aggregated)
 }
 # Apply createTopicSeries-function
-topicSeriesHeadphone <- createTopicSeries(merged_topic_headphone, top10brands_headphone)
 topicSeriesCellphone <- createTopicSeries(merged_topic_cellphone, top10brands_cellphone)
 
 # PLOT TIME SERIES FOR AVERAGE SENTIMENT SCORE
-plotTopicSeries <- function(input, brandSelect, brandText, begin, end, ylim){
+plotTopicSeries <- function(input, brandSelect, brandText, begin, end, ylim, labels){
   # Filter for the products and time range
   input <- input %>%
     filter(brand == brandSelect, date >= begin & date <= end)
+  input$date <- as.factor(input$date)
   # mainTopic as factor for x-axis
   input$mainTopic <- as.factor(input$mainTopic)
   # Plot data
@@ -162,16 +167,28 @@ plotTopicSeries <- function(input, brandSelect, brandText, begin, end, ylim){
     geom_line(aes(y = AvgScore), size = 1) + 
     theme_classic() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(title = paste("Topic-Sentiment over Time for", brandText, sep = " "), y = "Average Sentiment", x = "Period") + 
-    ylim(ylim) + 
-    scale_colour_hue(name = "MainTopic", labels = c(1,2,3,4,5)) 
+    labs(y = "Average Sentiment", x = "Time Period") + 
+    scale_colour_hue(name = "MainTopic", labels = labels) +
+    theme(text = element_text(size = 12, family = "LM Roman 10")) +
+    ylim(ylim)
 }
 # Apply plotTimeSeries-function
 plotTopicSeries(topicSeriesHeadphone, "beats", "Beats (Headphones)", "2012-01", "2014-03", c(-1,1))
 plotTopicSeries(topicSeriesHeadphone, "bose", "Bose (Headphones)", "2013-01", "2014-03", c(-1,1))
 plotTopicSeries(topicSeriesHeadphone, "sennheiser", "Sennheiser (Headphones)", "2013-01", "2014-03", c(-1,1))
-plotTopicSeries(topicSeriesCellphone, "apple", "Apple (Cellphones)", "2011-01", "2014-07", c(-1.1,1))
-plotTopicSeries(topicSeriesCellphone, "samsung", "Samsung (Cellphones)", "2013-01", "2014-03", c(-1,1))
+png("8_TimeSeriesSoA-Apple.png", res = 300, units="in", width=7, height=3)
+plotTopicSeries(topicSeriesCellphone, "apple", "Apple (Cellphones)", "2012-01", "2013-12", c(-1.7,1.5), c("Purchase", "Software", "Hardware", "Brand Attitude", "Battery Life")) +
+  # Add lines for product launch dates
+  # iPhone 5
+  geom_vline(aes(xintercept = which(levels(date) %in% "2012-10")), color="red") +
+  geom_label(stat = 'identity', aes(x = which(levels(date) %in% "2012-10"), label = "Launch Apple iPhone 5", y = 0), color = "red", angle = 90, vjust = -3, hjust = 0, family = "LM Roman 10")
+dev.off()
+png("8_TimeSeriesSoA-Samsung.png", res = 300, units="in", width=7, height=3)
+plotTopicSeries(topicSeriesCellphone, "samsung", "Samsung (Cellphones)", "2012-01", "2013-12", c(-1.7,1.5), c("Purchase", "Software", "Hardware", "Brand Attitude", "Battery Life")) +
+  # Samsung S3
+  geom_vline(aes(xintercept = which(levels(date) %in% "2012-05")), color="blue") +
+  geom_label(stat = 'identity', aes(x = which(levels(date) %in% "2012-05"), label = "Launch Samsung S3", y = 0), color= "blue", angle = 90, vjust = -3, hjust = 0, family = "LM Roman 10")
+dev.off()
 
 # CREATE TIME SERIES FOR AVERAGE TOPIC DISTRIBUTION FOR BRANDS
 createProductTopicSeries <- function(input, brandSelect){
@@ -196,12 +213,11 @@ createProductTopicSeries <- function(input, brandSelect){
   return(aggregated)
 }
 # Apply createTopicSeries-function
-topicProductSeriesHeadphone <- createProductTopicSeries(merged_topic_headphone, top10brands_headphone)
 topicProductSeriesCellphone <- createProductTopicSeries(merged_topic_cellphone, top10brands_cellphone)
 topicProductSeriesCellphone <- createProductTopicSeries(productComparisonCellphone, top10brands_cellphone) # with corrected product data
 
 # PLOT TOPIC-TIME SERIES FOR PRODUCT
-plotProductTopicSeries <- function(input, productSelect, brandText, begin, end, ylim){
+plotProductTopicSeries <- function(input, productSelect, brandText, begin, end, ylim, labels){
   # Filter for the products and time range
   input <- input %>%
     filter(title == productSelect, date >= begin & date <= end)
@@ -212,14 +228,18 @@ plotProductTopicSeries <- function(input, productSelect, brandText, begin, end, 
     geom_line(aes(y = AvgScore), size = 1) + 
     theme_classic() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(title = paste("Topic-Sentiment over Time for", brandText, sep = " "), y = "Average Sentiment", x = "Period") + 
+    labs(y = "Average Sentiment Score", x = "Time Period") + 
     ylim(ylim) + 
-    scale_colour_hue(name = "MainTopic", labels = c(1, 2, 3 , 4, 5)) 
+    theme(text = element_text(size = 12, family = "LM Roman 10")) +
+    scale_colour_hue(name = "MainTopic", labels = labels) 
 }
-# Apply plotTopicSeries-function
-plotProductTopicSeries(topicProductSeriesCellphone, "Galaxy S3", "Samsung S3", "2012-05", "2013-12", c(-2,2))
-plotProductTopicSeries(topicProductSeriesCellphone, "iPhone 5", "iPhone 5", "2012-10", "2013-12", c(-2,2))
-
+# Apply plotProductTopicSeries-function
+png("8_TimeSeriesSoA-iPhone.png", res = 300, units="in", width=7, height=3)
+plotProductTopicSeries(topicProductSeriesCellphone, "Galaxy S3", "Samsung Galaxy S3", "2012-05", "2013-12", c(-2,2), c("Purchase", "Software", "Hardware", "Satisfaction", "Battery Life"))
+dev.off()
+png("8_TimeSeriesSoA-Galaxy.png", res = 300, units="in", width=7, height=3)
+plotProductTopicSeries(topicProductSeriesCellphone, "iPhone 5", "Apple iPhone 5", "2012-10", "2014-05", c(-2,2), c("Purchase", "Software", "Hardware", "Satisfaction", "Battery Life"))
+dev.off()
 plotProductTopicSeries(topicProductSeriesCellphone, "Apple iPhone 5s, Space Gray 16GB (Unlocked)", "iPhone 5s", "2012-01", "2014-12", c(-2,2))
 plotProductTopicSeries(topicProductSeriesCellphone, "Apple iPhone 3G 8GB Black - Factory Unlocked", "iPhone 3G", "2010-01", "2014-12", c(-2,2))
 plotProductTopicSeries(topicProductSeriesCellphone, "Sony Xperia SL LT26II Unlocked Android Phone--U.S. Warranty (Black)", "Sony Xperia SL", "2010-01", "2014-12", c(-2,2))

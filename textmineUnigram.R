@@ -2,10 +2,7 @@
 # textmineUnigram.R
 # Load required packages
 library(dplyr) 
-library(stringr)
-library(tidyr)
-library(tidytext) 
-library(textcat)
+library(tidytext) # unnest tokens
 library(ggplot2)
 
 # CREATE UNIGRAM TOKENS
@@ -97,50 +94,28 @@ toasterBrandWords <- left_join(wf_toaster_brand, toasterBrandWords)
 coffeeBrandWords <- left_join(wf_coffee_brand, coffeeBrandWords)
 
 # PLOT WORD DISTRIBUTION 
-plotWordDistribution <- function(input1, input2, input3, input4, title) {
+plotWordDistribution <- function(input1, input2, input3, input4) {
   input1$Category <- rep("Headphones", nrow(input1))
   input2$Category <- rep("Cellphones", nrow(input2))
   input3$Category <- rep("Toasters", nrow(input3))
   input4$Category <- rep("Coffee Makers", nrow(input4))
   merged <- do.call("rbind", list(input1, input2, input3, input4))
   merged %>% 
-    ggplot(aes(n/total)) +
+    ggplot(aes(n / total)) +
     geom_histogram(show.legend = FALSE) +
-    ggtitle(paste("Wort Contribution within each Category", sep="")) +
+    #ggtitle("Wort Contribution within each Category", sep="") +
+    xlab("Relation to Total Amount of Words") + 
+    ylab("Word Count") +
     xlim(NA, 0.0009) +
-    facet_wrap(~Category, ncol = 2, scales = "free_y")
+    theme(text = element_text(size = 15, family = "LM Roman 10")) + # Latex Font
+    facet_wrap(~ Category, ncol = 2, scales = "free_y")
 }
 # Apply plotWordDistribution-function
-plotWordDistribution(headphoneWords, cellphoneWords, toasterWords, coffeeWords, "XY")
+plotWordDistribution(headphoneWords, cellphoneWords, toasterWords, coffeeWords)
 plotWordDistribution(headphoneWords, "Headphones")
 plotWordDistribution(cellphoneWords, "Cellphones")
 plotWordDistribution(toasterWords, "Toasters")
 plotWordDistribution(coffeeBrandWords, "Coffee Makers")
-
-# BRAUCH GLAUB KEINE SAU
-# # PLOT WORD DISTRIBUTION FOR BRANDS
-# # Treshold has to be set, otherwise too many brands
-# # Optionally, a special brand name can be required as well
-# plotWortDistributionBrands <- function(input, treshold, individualBrand, title) {
-#   input %>% 
-#     filter(total > treshold | brand == individualBrand) %>%
-#     ggplot(aes(n/total, fill = brand)) +
-#     geom_histogram(show.legend = FALSE) +
-#     ggtitle(paste("Wort Contribution regarding different Brands for", title, sep=" ")) +
-#     xlim(NA, 0.0009) +
-#     facet_wrap(~brand, ncol = 2, scales = "free_y")
-# }
-# # Apply Function
-# plotWortDistributionBrands(headphoneBrandWords, 280000, "beats", "Headphones")
-
-# BRAUCH MAN GLAUB NET
-# CREATE TF-IDF FOR OVERALL
-# createTFIDFbrand <- function(input) {
-#   input %>%
-#     bind_tf_idf(word, brand, n)
-# }
-# # Apply Function
-# headphoneBrandTFIDF <- createTFIDFbrand(headphoneBrandWords)
 
 # FÜR DEN PLOT
 # CREATE TF-IDF FOR BRAND
@@ -148,35 +123,8 @@ createTFIDFbrand <- function(input) {
   input %>%
     bind_tf_idf(word, brand, n)
 }
-# Apply Function
+# Apply createTFIDFbrand-function
 headphoneBrandTFIDF <- createTFIDFbrand(headphoneBrandWords)
-# 
-# # FILTER AND SORT BY BRAND
-# filterBrandTFIFT <- function(input, brandname){
-#   input %>%
-#     filter(brand == brandname) %>%
-#     select(-total) %>%
-#     arrange(desc(tf_idf))
-# }
-# # Apply Function
-# filterBrandTFIFT(headphoneBrandTFIDF, "beats")
-# filterBrandTFIFT(headphoneBrandTFIDF, "bose")
-
-# IST HIER GLAUBE ICH UNNOETIG
-# Function for plotting 
-# getSentimentPlot <- function(input) {
-#   input %>%
-#     group_by(sentiment) %>%
-#     top_n(10) %>%
-#     ungroup() %>%
-#     mutate(word = reorder(word, n)) %>%
-#     ggplot(aes(word, n, fill = sentiment)) +
-#     geom_col(show.legend = FALSE) +
-#     facet_wrap(~sentiment, scales = "free_y") +
-#     labs(y = "Contribution to sentiment",
-#          x = NULL) +
-#     coord_flip()
-# }
 
 # Create TF-IDF
 tfidf_words_brand <- function(input, undesired, brandList) {
@@ -194,26 +142,6 @@ tfidf_words_brand <- function(input, undesired, brandList) {
 }
 # Apply tfidf_words_brand-function
 tfidf_headphone <- tfidf_words_brand(prep_headphone_brand, c("headphone"), top10brands_headphone)
-
-# EHER NICHT
-# # Create TF-IDF for Overall Rating
-# popular_tfidf_words <- function(input, undesired) {
-#   input %>%
-#     unnest_tokens(word, review) %>%
-#     distinct() %>%
-#     filter(!word %in% undesired) %>%
-#     anti_join(stop_words) %>%
-#     count(overall, word, sort = TRUE) %>%
-#     ungroup() %>%
-#     bind_tf_idf(word, overall, n)
-# }
-# # Get the top words for every star rating
-# tfidf_cellphone <- popular_tfidf_words(prep_headphone_brand, c("headphone"))
-# tfidf_cellphone %>% filter(overall == 1)
-# tfidf_cellphone %>% filter(overall == 5)
-# tfidf_cellphone %>% filter(overall == 2)
-# tfidf_cellphone %>% filter(overall == 3)
-# tfidf_cellphone %>% filter(overall == 4)
 
 # PLOT TF-IDF
 plotTFIDFbrand <- function(input, brandList) {

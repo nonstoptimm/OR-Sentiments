@@ -9,7 +9,7 @@ prepColumns <- function(input) {
   input$review <- paste(input$summary,input$reviewText, sep=" ")
   # Delete old column
   input$reviewText <- input$summary <- NULL
-  # Character Encoding
+  # Character encoding
   input$review <- iconv(input$review, "latin1", "ASCII", sub="")
   # Define reviewTime-column as da date
   input$reviewTime <- as.Date(input$reviewTime, format = '%m %d, %Y')
@@ -17,7 +17,7 @@ prepColumns <- function(input) {
   input$overall <- as.integer(input$overall)
   # Substitute "&amp;" in Product Title
   input$title <- gsub("\\&amp;", " ", input$title)
-  # Substitute "&amp;" in Brand Names
+  # Substitute "&amp;" in brand names
   input$brand <- gsub("\\&amp;", " ", input$brand)
   # Create ID for each document, combining asin and reviewerID
   input$document <- paste(input$asin, input$reviewerID, sep = "-") 
@@ -33,7 +33,7 @@ raw_homekitchen <- prepColumns(raw_homekitchen)
 cutReviewColumns <- function(input) { 
   input[, c("asin", "overall", "reviewText", "reviewTime", "reviewerID", "summary")]
 }
-# Apply cutReviewColumns to raw review datasets
+# Apply cutReviewColumns-function to raw review datasets
 raw_cellphone <- cutReviewColumns(raw_cellphone)
 raw_electronics <- cutReviewColumns(raw_electronics)
 raw_homekitchen <- cutReviewColumns(raw_homekitchen)
@@ -80,12 +80,8 @@ prep_coffee_brand1 <- filterScore(prep_coffee_brand)
 prep_toaster_brand1 <- filterScore(prep_toaster_brand)
 
 # CONVERT DATA INTO TIBBLE FORMAT
-# Make as tibble, otherwise they can't be proceeded by the tidy tokenizer
-makeTibble <- function(input){
-  as_tibble(input)
-}
-# Apply makeTibble-function
-prep_headphone_brand <- makeTibble(prep_headphone_brand)
-prep_cellphone_brand <- makeTibble(prep_cellphone_brand)
-prep_toaster_brand <- makeTibble(prep_toaster_brand)
-prep_coffee_brand <- makeTibble(prep_coffee_brand)
+# Make as_tibble, otherwise they can't be proceeded by the tidy tokenizer
+prep_headphone_brand <- as_tibble(prep_headphone_brand)
+prep_cellphone_brand <- as_tibble(prep_cellphone_brand)
+prep_toaster_brand <- as_tibble(prep_toaster_brand)
+prep_coffee_brand <- as_tibble(prep_coffee_brand)

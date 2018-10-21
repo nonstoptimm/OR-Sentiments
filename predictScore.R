@@ -30,9 +30,6 @@ mediateHeadphone <- as_tibble(prep_headphone_brand[sampleHeadphone, ])
 mediateToaster <- as_tibble(prep_toaster_brand[sampleToaster, ])
 mediateCoffee <- as_tibble(prep_coffee_brand[sampleCoffee, ])
 
-# INDIVIDUAL STOPWORD LIST
-# stopword_list <- c("a",	"about",	"after",	"again",	"against",	"all",	"am",	"an",	"and",	"any",	"are",	"aren't",	"as",	"at",	"be",	"because",	"been",	"before",	"being",	"between",	"both",	"by",	"can't",	"cannot",	"could",	"couldn't",	"did",	"didn't",	"do",	"does",	"doesn't",	"doing",	"don't",	"down",	"during",	"each",	"for",	"from",	"further",	"had",	"hadn't",	"has",	"hasn't",	"have",	"haven't",	"having",	"he",	"he'd",	"he'll",	"he's",	"her",	"here",	"here's",	"hers",	"herself",	"him",	"himself",	"his",	"how",	"how's",	"i",	"i'd",	"i'll",	"i'm",	"i've",	"if",	"in",	"into",	"it", "isn't",	"it's",	"its",	"itself",	"let's",	"me",	"more",	"most",	"mustn't",	"my",	"myself",	"nor",	"only",	"other",	"ought",	"our",	"ours",	"ourselves",	"out",	"over",	"own",	"same",	"shan't",	"she",	"she'd",	"she'll",	"she's",	"should",	"shouldn't",	"so",	"some",	"such",	"that",	"that's",	"the",	"their",	"theirs",	"them",	"themselves",	"then",	"there",	"there's",	"these",	"they",	"they'd",	"they'll",	"they're",	"they've",	"this",	"those",	"through", "to",	"too",	"under",	"until",	"up",	"very",	"was",	"wasn't",	"we",	"we'd",	"we'll",	"we're",	"we've",	"were",	"weren't",	"what",	"what's",	"when",	"when's",	"where",	"where's",	"which",	"while",	"who",	"who's",	"whom",	"why",	"why's",	"with",	"won't",	"would",	"wouldn't",	"you",	"you'd",	"you'll",	"you're",	"you've",	"your",	"yours",	"yourself",	"yourselves")
-
 # MEDIATE DATA
 removeXGsw <- function(input){
   input %>% 
@@ -186,7 +183,8 @@ importanceCoffee <- xgbImpVarClean(importanceCoffee)
 # PLOT IMPORTANCE
 xgbPlot <- function(input, var){
   xgb.ggplot.importance(importance_matrix = input, top_n = 20) +
-  ggtitle(paste("Variable Importance for the XGBOOST model of", var, sep=" ")) 
+  #ggtitle(paste("Feature Importance for", var, sep=" ")) +
+    theme(text = element_text(size=12, family="LM Roman 10"))
   #+ geom_bar(stat = "identity", width = 10)
 }
 # Apply xgbPlot-function

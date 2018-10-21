@@ -24,7 +24,7 @@ categorizeMetaPhone <- function(input) {
 }
 # Apply categorizeMetaToaster-function
 meta_cellphone <- categorizeMetaPhone(meta_cellphone)
-# Apply inner_join
+# Apply joinData-function
 merged_cellphone <- joinData(raw_cellphone, meta_cellphone)
 
 # HEADPHONES
@@ -39,7 +39,7 @@ categorizeMetaHeadphones <- function(input) {
 }
 # Apply categorizeMetaToaster-function
 meta_headphone <- categorizeMetaHeadphones(meta_electronics)
-# Apply inner_join
+# Apply joinData-function
 merged_headphone <- joinData(raw_headphone, meta_headphone)
 
 # COFFEE MACHINE
@@ -54,7 +54,7 @@ categorizeMetaCoffee <- function(input) {
 }
 # Apply categorizeMetaToaster-function
 meta_coffee <- categorizeMetaCoffee(meta_homekitchen)
-# Apply inner_join
+# Apply joinData-function
 merged_coffee <- joinData(raw_homekitchen, meta_coffee)
 
 # TOASTER
@@ -69,7 +69,7 @@ categorizeMetaToaster <- function(input) {
 }
 # Apply categorizeMetaToaster-function
 meta_toaster <- categorizeMetaToaster(meta_homekitchen)
-# Apply inner_join
+# Apply joinData-function
 merged_toaster <- joinData(raw_homekitchen, meta_toaster)
 
 # DETECT REVIEW LANGUAGE

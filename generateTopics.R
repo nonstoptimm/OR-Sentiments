@@ -107,12 +107,12 @@ createLDA <- function(input, ntopic) {
   # Delete all empty rows
   input <- input[rowSum > 0, ]
   # LDA Gibbs Parameter
-  burnin <- 4000
-  iter <- 2000
-  thin <- 500
-  seed <- list(2003,5,63,100001,765)
-  nstart <- 5
-  best <- TRUE
+  burnin <- 4000 # random walk
+  iter <- 2000 # number of iterations
+  thin <- 500 # every 500 for continuous use
+  seed <- list(2003,5,63,100001,765) # five seeds as 5 starting points
+  nstart <- 5 # starting points for random starts, reduces correlations
+  best <- TRUE # return results with highest probability
   # Amount of topics to be generated
   k <- ntopic
   # Create LDA model using Gibbs sampling

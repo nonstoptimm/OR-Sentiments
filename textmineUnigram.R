@@ -1,4 +1,5 @@
 # TEXT MINING OF UNIGRAMS
+# Investigation of unigrams
 # textmineUnigram.R
 # Load required packages
 library(dplyr) 
@@ -147,7 +148,6 @@ tfidf_headphone <- tfidf_words_brand(prep_headphone_brand, c("headphone"), top10
 plotTFIDFbrand <- function(input, brandList) {
   input %>% 
     filter(brand %in% brandList$brand[1:9]) %>%
-    #filter(total > totalwords) %>% 
     arrange(desc(tf_idf)) %>%
     mutate(word = factor(word, levels = rev(unique(word)))) %>% 
     group_by(brand) %>% 

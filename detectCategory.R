@@ -1,3 +1,4 @@
+# CATEGORY DETECTOR
 # detectCategory.R
 # Script to detect the category dimensions, just for exploration
 # Load required packages

@@ -1,4 +1,5 @@
 # TEXT MINING OF BIGRAMS
+# Investigation of bigrams
 # textBigram.R
 # Load required packages
 library(dplyr)
@@ -104,7 +105,6 @@ plotNotWords <- function(input, text, selectBrand) {
       xlab("Terms preceded by \"not\"") +
       ylab("Sentiment Score * TF") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-      theme_classic() +
       coord_flip() +
       #ggtitle(paste("Negate-Words for", text, sep = " ")) +
       theme(text = element_text(size = 15, family = "LM Roman 10")) # Latex Font

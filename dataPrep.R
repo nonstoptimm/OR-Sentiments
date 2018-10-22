@@ -1,4 +1,5 @@
 # DATA PREPARATION
+# Prepare raw data
 # dataPrep.R
 # Load required packages
 library(dplyr)
@@ -69,6 +70,7 @@ prep_coffee_brand <- addSentiScoreLX(prep_coffee_brand, sentimentReviewCoffee)
 prep_toaster_brand <- addSentiScoreLX(prep_toaster_brand, sentimentReviewToaster)
 
 # ONLY KEEP THE ONES WITH A VALUE FOR "WORDS"
+# This can be determined by filtering for non-existing values in "scoreLX"
 filterScore <- function(input){
   input %>%
     filter(!scoreLX == "")
@@ -78,10 +80,3 @@ prep_headphone_brand1 <- filterScore(prep_headphone_brand)
 prep_cellphone_brand1 <- filterScore(prep_cellphone_brand)
 prep_coffee_brand1 <- filterScore(prep_coffee_brand)
 prep_toaster_brand1 <- filterScore(prep_toaster_brand)
-
-# CONVERT DATA INTO TIBBLE FORMAT
-# Make as_tibble, otherwise they can't be proceeded by the tidy tokenizer
-prep_headphone_brand <- as_tibble(prep_headphone_brand)
-prep_cellphone_brand <- as_tibble(prep_cellphone_brand)
-prep_toaster_brand <- as_tibble(prep_toaster_brand)
-prep_coffee_brand <- as_tibble(prep_coffee_brand)

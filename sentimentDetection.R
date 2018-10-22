@@ -1,4 +1,5 @@
 # LEXICON-BASED SENTIMENT ANALYSIS
+# Sentiment detection and comparison to star levels
 # sentimentDetection.R
 # Load required packages
 library(dplyr)
@@ -149,18 +150,10 @@ sentiContributionPlot <- function(input, selectCategory) {
     scale_fill_manual(values=c( "firebrick", "dodgerblue4"))
 }
 # Apply sentiContributionPlot-function
-png("7_ContributionHeadphone.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionHeadphone, "Headphones")
-dev.off()
-png("7_ContributionCellphone.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionCellphone, "Cellphones")
-dev.off()
-png("7_ContributionToaster.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionToaster, "Toaster")
-dev.off()
-png("7_ContributionCoffee.png", res = 300, units="in", width=7, height=5)
 sentiContributionPlot(contributionCoffee, "Coffee")
-dev.off()
 
 # CREATE BOXPLOT FOR OVERALL VS. SCORELX
 boxplotScoreLX <- function(input, cat){
@@ -177,18 +170,10 @@ boxplotScoreLX <- function(input, cat){
     ylim(-4,5)
 }
 # Apply boxplotScore-function
-png("7_BoxplotHeadphoneLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_headphone_brand, "Headphones")
-dev.off()
-png("7_BoxplotCellphoneLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_cellphone_brand, "Cellphones")
-dev.off()
-png("7_BoxplotToasterLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_toaster_brand, "Toasters")
-dev.off()
-png("7_BoxplotCoffeeLX.png", res = 300, units="in", width=7, height=4)
 boxplotScoreLX(prep_coffee_brand, "Coffee Makers")
-dev.off()
 
 # CREATE BOXPLOT FOR OVERALL VS. SCORENN
 boxplotScoreNN <- function(input, cat){
@@ -203,14 +188,7 @@ boxplotScoreNN <- function(input, cat){
     ylim(-5,3)
 }
 # Apply boxplotScore-function
-png("7_BoxplotHeadphoneML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_headphone_brand, "Headphones")
-dev.off()
-png("7_BoxplotCellphoneML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_cellphone_brand, "Cellphones")
-dev.off()
-png("7_BoxplotToasterML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_toaster_brand, "Toasters")
-dev.off()
-png("7_BoxplotCoffeeML.png", res = 300, units="in", width=7, height=4)
 boxplotScoreNN(prep_coffee_brand, "Coffee Makers")

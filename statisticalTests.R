@@ -1,4 +1,5 @@
 # STATISTICAL TESTS
+# Descriptive statistics on review scores
 # statisticalTests.R
 library(dplyr)
 
@@ -38,7 +39,7 @@ calcMeanScoreLX <- function(input) {
   names(mean_scores) <- c("Mean Stars", "Mean Score", "MS1", "MS2", "MS3", "MS4", "MS5")
   return(as.data.frame(mean_scores))
 }
-# ML/OVERALL
+# EXAMINATION ML-SCORE/OVERALL STAR-SCORE
 calcMeanScoreNN <- function(input) {
   mean_overall <- mean(input$overall)
   mean_score_total <- mean(input$scoreNN)
@@ -67,7 +68,7 @@ calcMeanScoreLX(prep_coffee_brand)
 calcMeanScoreNN(prep_coffee_brand)
 
 # VARIANCE FOR SENTIMENT SCORE: LX & NN
-# LX
+# LX-MODEL
 calcVarScoreLX <- function(input) {
   var_overall <- var(input$scoreLX)
   var_scores <- c()
@@ -80,7 +81,7 @@ calcVarScoreLX <- function(input) {
   names(var_scores) <- c("VarG", "Var1", "Var2", "Var3", "Var4", "Var5")
   return(as.data.frame(var_scores))
 }
-# ML
+# LX-MODEL
 calcVarScoreNN <- function(input) {
   var_overall <- var(input$scoreNN)
   var_scores <- c()
@@ -108,7 +109,7 @@ calcVarScoreLX(prep_coffee_brand)
 calcVarScoreNN(prep_coffee_brand)
 
 # STANDARD DEVIATION SCORE: LX & NN
-# LX
+# LX-MODEL
 calcSdScoreLX <- function(input) {
   var_overall <- sd(input$scoreLX)
   sd_scores <- c()
@@ -121,7 +122,7 @@ calcSdScoreLX <- function(input) {
   names(sd_scores) <- c("SdG", "Sd1", "Sd2", "Sd3", "Sd4", "Sd5")
   return(as.data.frame(sd_scores))
 }
-# ML
+# ML-MODELL
 calcSdScoreNN <- function(input) {
   var_overall <- sd(input$scoreNN)
   sd_scores <- c()
@@ -149,17 +150,17 @@ calcSdScoreLX(prep_coffee_brand)
 calcSdScoreNN(prep_coffee_brand)
 
 # CORRELATION COEFFICIENT: SCORE LX & NN
-# LX
+# LX-MODELL
 corrCoeffLX <- function(input) {
   correlation <- cor(input$overall, input$scoreLX)
   return(correlation)
 }
-# ML
+# ML-MODEL
 corrCoeffNN <- function(input) {
   correlation <- cor(input$overall, input$scoreNN)
   return(correlation)
 }
-# Calculate Correlation Coefficient for Sentiment Scores
+# Apply corrCoeffLX/corrCoeffNN-functions
 # Cellphone
 corrCoeffLX(prep_cellphone_brand)
 corrCoeffNN(prep_cellphone_brand)

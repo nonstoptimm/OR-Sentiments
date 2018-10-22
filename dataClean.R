@@ -1,4 +1,5 @@
 # DATA CLEANING
+# Clean raw review data
 # dataCleaning.R
 # Load required packages
 library(dplyr)

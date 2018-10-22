@@ -1,4 +1,5 @@
 # OBJECT WRITER 
+# Save generated/proceeded data
 # saveData.R
 # Load required packages
 library(data.table)
@@ -52,7 +53,6 @@ saveXG <- function(input, filename){
   xgb.save(input, paste("output/", filename, sep=""))
 }
 # Apply saveXG-function
-saveXG(xgbHeadphone, "2018-09-25-XG_Headphones")
 saveXG(xgbCellphone, "XG_Cellphones")
-saveXG(xgbCoffee, "XG_Coffee")
-saveXG(xgbToaster, "XG_Toaster")
+saveXG(xgbHeadphone, "XG_Headphones1")
+

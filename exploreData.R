@@ -36,7 +36,7 @@ plotBarchart <- function(input1, input2, input3, input4){
     geom_bar(stat = "identity", width = 0.7) +
     labs(x = "Category", y = "Percent", fill = "Star Rating") +
     scale_fill_brewer(palette="RdYlGn") +
-    #ggtitle("Percentage distribution of Star Ratings") +
+    # ggtitle("Percentage distribution of Star Ratings") +
     theme(text = element_text(size = 15, family = "LM Roman 10")) + # Latex Font
     coord_flip()
 }
@@ -44,7 +44,7 @@ plotBarchart <- function(input1, input2, input3, input4){
 plotBarchart(prep_coffee_brand, prep_toaster_brand, prep_cellphone_brand, prep_headphone_brand)
 
 # PLOT HISTORGAM FOR OVERALL RATING
-# Not included in Master Thesis Document, as substituted by plotBarchart
+# Not included in Thesis document, as substituted by plotBarchart, but insightful
 plotHistogram <- function(input, title, xdesc, .) {
   ggplot(input, aes(.)) +
     geom_histogram(binwidth = 0.5) +
@@ -137,6 +137,7 @@ top10products_coffee <- countBrandsProduct(prep_coffee_brand)
 top10products_toaster <- countBrandsProduct(prep_toaster_brand)
 
 # DETECT ALL PRODUCTS FROM A BRAND
+# No special use, just for exploration
 detectProducts <- function(input, brandSelect){
   input %>% 
     filter(brand == brandSelect) %>%

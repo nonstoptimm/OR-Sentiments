@@ -1,4 +1,5 @@
 # TOPIC-ORIENTED SENTIMENT ANALYSIS
+# Analyze created topics with regard to sentiment score
 # analyzeTopics.R
 # Load required packages
 library(dplyr)
@@ -65,25 +66,3 @@ kwTest(sampleScoreHeadphone)
 kwTest(sample_n(merged_topic_headphone, 70))
 kwTest(sample_n(merged_topic_toaster, 70))
 kwTest(sample_n(merged_topic_coffee, 70))
-
-# DATA SAMPLE
-sampleData <- function(input, n){
-  data <- sample_n(input, n)
-  return(data)
-}
-# Apply sampleData-function
-sampleScoreCellphone <- sampleData(merged_topic_cellphone, 70)
-sampleScoreHeadphone <- sampleData(merged_topic_headphone, 100)
-
-# SHAPIRO TEST
-shapiro.test(sampleScoreCellphone$scoreNN)
-shapiro.test(sampleScoreHeadphone$scoreNN)
-
-# ANOVA-TEST 
-anovaTest <- function(input){
-  input$mainTopic <- as.factor(input$mainTopic)
-  summary(aov(input$scoreNN ~ input$mainTopic))
-}
-# Apply anovaTest-function
-anovaTest(sampleScoreCellphone)
-anovaTest(sampleScoreHeadphone)

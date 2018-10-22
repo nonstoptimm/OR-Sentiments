@@ -1,4 +1,5 @@
 # DATA CATEGORIZER
+# Extract categories from meta data and merge with review data
 # categorizeData.R
 # Load required packages
 library(dplyr)
@@ -119,7 +120,7 @@ merged_coffee_brand$document <- createID(merged_coffee_brand)
 merged_headphone_brand$document <- createID(merged_headphone_brand)
 
 # ADD NN-SENTIMENTSCORE TO BRANDED PRODUCTS
-# They have only been calculated for branded products!
+# They have only been calculated for branded products
 merged_cellphone_brand$scoreNN <- addSentiScore(score_cellphone)
 merged_toaster_brand$scoreNN <- addSentiScore(score_toaster)
 merged_coffee_brand$scoreNN <- addSentiScore(score_coffee)

@@ -43,21 +43,6 @@ meta_headphone <- categorizeMetaHeadphones(meta_electronics)
 # Apply joinData-function
 merged_headphone <- joinData(raw_headphone, meta_headphone)
 
-# COFFEE MACHINE
-categorizeMetaCoffee <- function(input) {
-  data <- input %>%
-    filter(categories.0.0 == "Home & Kitchen" & categories.0.1 == "Kitchen & Dining" & categories.0.2 == "Coffee, Tea & Espresso" & categories.0.3 == "Coffee Makers")
-  # Remove all category columns
-  data$categories.0.0 <- data$categories.0.1 <- data$categories.0.2 <- data$categories.0.3 <- data$categories.0.4 <- NULL
-  # Add "Coffee Makers"-Column
-  data$category <- rep("Coffee Makers", nrow(data))
-  return(data)  
-}
-# Apply categorizeMetaToaster-function
-meta_coffee <- categorizeMetaCoffee(meta_homekitchen)
-# Apply joinData-function
-merged_coffee <- joinData(raw_homekitchen, meta_coffee)
-
 # TOASTER
 categorizeMetaToaster <- function(input) {
   data <- input %>%
@@ -73,6 +58,21 @@ meta_toaster <- categorizeMetaToaster(meta_homekitchen)
 # Apply joinData-function
 merged_toaster <- joinData(raw_homekitchen, meta_toaster)
 
+# COFFEE MAKERS
+categorizeMetaCoffee <- function(input) {
+  data <- input %>%
+    filter(categories.0.0 == "Home & Kitchen" & categories.0.1 == "Kitchen & Dining" & categories.0.2 == "Coffee, Tea & Espresso" & categories.0.3 == "Coffee Makers")
+  # Remove all category columns
+  data$categories.0.0 <- data$categories.0.1 <- data$categories.0.2 <- data$categories.0.3 <- data$categories.0.4 <- NULL
+  # Add "Coffee Makers"-Column
+  data$category <- rep("Coffee Makers", nrow(data))
+  return(data)  
+}
+# Apply categorizeMetaToaster-function
+meta_coffee <- categorizeMetaCoffee(meta_homekitchen)
+# Apply joinData-function
+merged_coffee <- joinData(raw_homekitchen, meta_coffee)
+
 # DETECT REVIEW LANGUAGE
 detectLanguage <- function(input) {
   langProfile <- TC_byte_profiles[names(TC_byte_profiles) %in% c("english", "french", "spanish", "german", "italian", "portuguese")]
@@ -81,9 +81,9 @@ detectLanguage <- function(input) {
 }
 # Apply detectLanguage-function
 merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
-merged_cellphone$reviewLanguage <- detectLanguage(merged_cellphone$review)
-merged_coffee$reviewLanguage <- detectLanguage(merged_coffee$review)
+merged_headphone$reviewLanguage <- detectLanguage(merged_headphone$review)
 merged_toaster$reviewLanguage <- detectLanguage(merged_toaster$review)
+merged_coffee$reviewLanguage <- detectLanguage(merged_coffee$review)
 
 # DELETE ALL NON-ENGLISH REVIEWS
 deleteNotEnglish <- function(input) {
@@ -94,8 +94,8 @@ deleteNotEnglish <- function(input) {
 # Apply deleteNotEnglish-function
 merged_cellphone <- deleteNotEnglish(merged_cellphone)
 merged_headphone <- deleteNotEnglish(merged_headphone)
-merged_coffee <- deleteNotEnglish(merged_coffee)
 merged_toaster <- deleteNotEnglish(merged_toaster)
+merged_coffee <- deleteNotEnglish(merged_coffee)
 
 # REMOVE ALL NON-BRANDED REVIEWS
 categorizeOnlyBranded <- function(input){
@@ -105,8 +105,8 @@ categorizeOnlyBranded <- function(input){
 # Apply categorizeOnlyBranded-function
 merged_cellphone_brand <- categorizeOnlyBranded(merged_cellphone)
 merged_headphone_brand <- categorizeOnlyBranded(merged_headphone)
-merged_coffee_brand <- categorizeOnlyBranded(merged_coffee)
 merged_toaster_brand <- categorizeOnlyBranded(merged_toaster)
+merged_coffee_brand <- categorizeOnlyBranded(merged_coffee)
 
 # CREATE DOCUMENT ID (UNIQUE DOCUMENT IDENTIFIER)
 createID <- function(input){
@@ -115,13 +115,13 @@ createID <- function(input){
 }
 # Apply createID-function
 merged_cellphone_brand$document <- createID(merged_cellphone_brand)
+merged_headphone_brand$document <- createID(merged_headphone_brand)
 merged_toaster_brand$document <- createID(merged_toaster_brand)
 merged_coffee_brand$document <- createID(merged_coffee_brand)
-merged_headphone_brand$document <- createID(merged_headphone_brand)
 
 # ADD NN-SENTIMENTSCORE TO BRANDED PRODUCTS
 # They have only been calculated for branded products
 merged_cellphone_brand$scoreNN <- addSentiScore(score_cellphone)
+merged_headphone_brand$scoreNN <- addSentiScore(score_headphone)
 merged_toaster_brand$scoreNN <- addSentiScore(score_toaster)
 merged_coffee_brand$scoreNN <- addSentiScore(score_coffee)
-merged_headphone_brand$scoreNN <- addSentiScore(score_headphone)

@@ -14,12 +14,12 @@ makeLow <- function(input) {
 }
 # Apply makeLow-function
 merged_cellphone_brand <- makeLow(merged_cellphone_brand)
-merged_coffee_brand <- makeLow(merged_coffee_brand)
 merged_headphone_brand <- makeLow(merged_headphone_brand)
 merged_toaster_brand <- makeLow(merged_toaster_brand)
+merged_coffee_brand <- makeLow(merged_coffee_brand)
 
 # CORRECT CONTRACTIONS
-# Here we use the contraction_list imported in importData.R
+# Here we use the contraction_list imported in dataImport.R
 correctContraction <- function(reviews, contraction_list) {
   # loop through imported contraction list from top to bottom
   for(pattern in 1:nrow(contraction_list)) {
@@ -30,11 +30,12 @@ correctContraction <- function(reviews, contraction_list) {
 }
 # Apply correctContraction-function
 merged_cellphone_brand$review <- correctContraction(merged_cellphone_brand$review, contraction_list)
-merged_coffee_brand$review <- correctContraction(merged_coffee_brand$review, contraction_list)
 merged_headphone_brand$review <- correctContraction(merged_headphone_brand$review, contraction_list)
 merged_toaster_brand$review <- correctContraction(merged_toaster_brand$review, contraction_list)
+merged_coffee_brand$review <- correctContraction(merged_coffee_brand$review, contraction_list)
 
 # CORRECT INDIVIDUAL WORDS
+# Apply when necessary
 correctWord <- function(input, before, after) {
   # individual words mentioned in the function input are substituted
   reviews <- gsub(before, after, input, ignore.case =TRUE)
@@ -56,9 +57,9 @@ removePunctuation <- function(reviews) {
 }
 # Apply removePunctuation-function
 merged_cellphone_brand$review <- removePunctuation(merged_cellphone_brand$review)
-merged_coffee_brand$review <- removePunctuation(merged_coffee_brand$review)
 merged_headphone_brand$review <- removePunctuation(merged_headphone_brand$review)
 merged_toaster_brand$review <- removePunctuation(merged_toaster_brand$review)
+merged_coffee_brand$review <- removePunctuation(merged_coffee_brand$review)
 
 # SUBSTITUTE "&" IN TITLE AND BRAND
 correctAnd <- function(input) {
@@ -67,9 +68,9 @@ correctAnd <- function(input) {
 }
 # Apply correctAnd-function
 merged_cellphone_brand$title <- gsub("\\&amp;", "&", merged_cellphone_brand$title)
-merged_cellphone_brand$brand <- gsub("\\&amp;", "&", merged_cellphone_brand$brand)
-prep_toaster_brand$title <- gsub("\\&amp;", "&", prep_toaster_brand$title)
-prep_toaster_brand$brand <- gsub("\\&amp;", "&", prep_toaster_brand$brand)
+merged_headphone_brand$brand <- gsub("\\&amp;", "&", merged_headphone_brand$brand)
+merged_toaster_brand$title <- gsub("\\&amp;", "&", merged_toaster_brand$title)
+merged_coffee_brand$brand <- gsub("\\&amp;", "&", merged_coffee_brand$brand)
 
 # WORD LEMMATIZATION
 lemmatizeText <- function(input) {
@@ -81,9 +82,3 @@ prep_cellphone_brand$review <- lemmatizeText(prep_cellphone_brand$review)
 prep_coffee_brand$review <- lemmatizeText(prep_coffee_brand$review)
 prep_toaster_brand$review <- lemmatizeText(prep_toaster_brand$review)
 prep_headphone_brand$review <- lemmatizeText(prep_headphone_brand$review)
-
-# CREATE A COPY FOR DTM
-dtm_cellphone_brand <- prep_cellphone_brand
-dtm_coffee_brand <- prep_coffee_brand
-dtm_toaster_brand  <- prep_toaster_brand
-dtm_headphone_brand  <- prep_headphone_brand

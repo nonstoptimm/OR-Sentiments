@@ -46,10 +46,6 @@ meanScoreTopic <- function(input, brandSelect){
     summarise(AvgScore=mean(scoreNN))
 }
 # Apply meanScoreTopic-function
-meanScoreTopic(merged_topic_cellphone, "")
-meanScoreTopic(merged_topic_headphone, "")
-meanScoreTopic(merged_topic_toaster, "")
-meanScoreTopic(merged_topic_coffee, "")
 topicScoreCellphone <- lapply(top10brands_cellphone$brand, function(brandSelect) meanScoreTopic(merged_topic_cellphone, brandSelect))
 topicScoreHeadphone <- lapply(top10brands_headphone$brand, function(brandSelect) meanScoreTopic(merged_topic_headphone, brandSelect))
 topicScoreToaster <- lapply(top10brands_toaster$brand, function(brandSelect) meanScoreTopic(merged_topic_toaster, brandSelect))
@@ -60,9 +56,8 @@ kwTest <- function(input){
   input$mainTopic <- as.factor(input$mainTopic)
   kruskal.test(scoreNN ~ mainTopic, data = input)
 }
-# Apply kwTest-function
-kwTest(sampleScoreCellphone)
-kwTest(sampleScoreHeadphone)
+# Apply kwTest-function combined with sample_n (70 data sets)
+kwTest(sample_n(merged_topic_cellphone, 70))
 kwTest(sample_n(merged_topic_headphone, 70))
 kwTest(sample_n(merged_topic_toaster, 70))
 kwTest(sample_n(merged_topic_coffee, 70))

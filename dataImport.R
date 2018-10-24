@@ -54,8 +54,8 @@ LDA_reviews_coffee <- readRDS("input-data/TopicModels/LDA_reviews_coffee.rds")
 LDA_reviews_toaster <- readRDS("input-data/TopicModels/LDA_reviews_toaster.rds")
 
 # IMPORT THE XGBOOST MODELS DATA
-xgbHeadphone <- xgb.load("output/XGBOOST/XG_Headphone")
-xgbCellphone <- xgb.load("output/XGBOOST/XG_Cellphone")
+xgbHeadphone <- xgb.load("input-data/XGBOOST/XG_Headphone")
+xgbCellphone <- xgb.load("input-data/XGBOOST/XG_Cellphone")
 
 # CLEANUP COMMAND
 # This command is sometimes really necessary to clean up the workspace

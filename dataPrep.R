@@ -76,7 +76,7 @@ filterScore <- function(input){
     filter(!scoreLX == "")
 }
 # Apply filterScore-function
-prep_headphone_brand1 <- filterScore(prep_headphone_brand)
-prep_cellphone_brand1 <- filterScore(prep_cellphone_brand)
-prep_coffee_brand1 <- filterScore(prep_coffee_brand)
-prep_toaster_brand1 <- filterScore(prep_toaster_brand)
+prep_headphone_brand_clean <- filterScore(prep_headphone_brand)
+prep_cellphone_brand_clean <- filterScore(prep_cellphone_brand)
+prep_coffee_brand_clean <- filterScore(prep_coffee_brand)
+prep_toaster_brand_clean <- filterScore(prep_toaster_brand)

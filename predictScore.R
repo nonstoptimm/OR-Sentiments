@@ -5,6 +5,7 @@
 library(Ckmeans.1d.dp) # required for the xgbVar-ggplot
 library(dplyr)
 library(pdp)
+library(purrr)
 library(text2vec)
 library(tidytext)
 library(tidyverse)

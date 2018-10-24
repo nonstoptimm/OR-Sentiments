@@ -54,5 +54,5 @@ saveXG <- function(input, filename){
 }
 # Apply saveXG-function
 saveXG(xgbCellphone, "XG_Cellphones")
-saveXG(xgbHeadphone, "XG_Headphones1")
+saveXG(xgbHeadphone, "XG_Headphones")
 

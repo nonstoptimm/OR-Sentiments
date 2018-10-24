@@ -3,10 +3,8 @@
 # generateTopics.R
 # Load required packages
 library(dplyr)
-library(purrr)
-library(tidyverse)
 library(tidytext)
-library(tm)
+library(tm) # sparseterms
 library(topicmodels)
 
 # CREATE A BRAND LIST TO USE IT FOR ANTI-JOIN
@@ -95,7 +93,6 @@ detectDocument <- function(input){
     arrange(document)
 }
 # Apply detectDocument-function
-#docIDHeadphone <- detectDocument(dtmHeadphoneSparse)
 docIDCellphone <- detectDocument(dtmCellphone)
 docIDHeadphone <- detectDocument(dtmHeadphone)
 docIDToaster <- detectDocument(dtmToaster)
@@ -117,7 +114,7 @@ createLDA <- function(input, ntopic) {
   # Amount of topics to be generated
   k <- ntopic
   # Create LDA model using Gibbs sampling
-  model <- LDA(input, k, method="Gibbs", control = list(nstart = spoint, seed = seed, best = bestround, burnin = rwalk, iter = niter, thin = thin))
+  model <- LDA(input, k, method = "Gibbs", control = list(nstart = spoint, seed = seed, best = bestround, burnin = rwalk, iter = niter, thin = thin))
   return(model)
 }
 # TRAIN MODEL WITH VMA
@@ -165,11 +162,10 @@ aggrTopics <- function(input, ntopics){
   return(merged)
 }
 # Apply aggrTopics-function
-topicsCellphone <- aggrTopics(LDA_reviews_cellphone, 4)
 topicsCellphone <- aggrTopics(LDA_reviews_cellphone, 5)
 topicsHeadphone <- aggrTopics(LDA_reviews_headphone, 5)
-topicsToaster <- aggrTopics(LDA_reviews_toaster, 4)
-topicsCoffee <- aggrTopics(LDA_reviews_coffee, 4)
+topicsToaster <- aggrTopics(LDA_reviews_toaster, 5)
+topicsCoffee <- aggrTopics(LDA_reviews_coffee, 5)
 
 # ADD VALUES TO THE DATASET
 addTopicValues <- function(input, values) {
@@ -184,7 +180,7 @@ merged_topic_coffee <- addTopicValues(prep_topic_coffee, topicsCoffee)
 
 # EXTRACT TOP WORDS PER TOPIC
 topicTopWords <- function(input, number){
-  topWords <- as.matrix(terms(input,number))
+  topWords <- as.matrix(terms(input, number))
   return(topWords)
 }
 # Apply topicTopWords-function
